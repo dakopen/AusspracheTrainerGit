@@ -52,10 +52,9 @@
         <hr style="height:1px; visibility:hidden; margin-bottom:-1px;">
         <div class="generator" align="center" style="display:flex; align-items: center;justify-content: center;">
             <h5 style="color:var(--rosa);font-size:min(24px, 6vw);font-weight:500;">ODER</h5>
-            <div class="dropdown" style="margin-left:1em;margin-right:1em;">
+            <div class="dropdown" style="margin-left:1em;margin-right:1em;" onclick="toggle_dropdown()" onfocusout="dropdown_fold()">
                 <div class="select">
                     <span>{{ textgenerator.0 }}</span>
-                    <i class="fa fa-chevron-left"></i>
                 </div>
                 <input type="hidden" name="satzart" value="{{ textgenerator.0 }}">
                 <ul class="dropdown-menu">
