@@ -20,8 +20,9 @@ from base import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.home, name="home"),
+    path("satzgenerator/", views.satzgenerator), 
 
-
+    
     path("privacy-policy/", views.privacypolicy, name="privacy_policy"),
     path("sources/", views.sources, name="sources"),
     path("about/", views.about, name="about"),

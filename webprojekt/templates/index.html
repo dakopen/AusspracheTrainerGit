@@ -41,7 +41,7 @@
 
     <div>
         <p align="center">
-            <textarea placeholder="Übungssatz" class="textarea-responsive" maxlength="120"></textarea>
+            <textarea placeholder="Übungssatz" id="textarea" class="textarea-responsive" maxlength="120"></textarea>
             <input type="image" onclick="" src="{% static 'assets/images/PPP Icon Bin.svg' %}" id="clear"
                 style="position: absolute; width: 28px; height: 28px; opacity: 0; transition: opacity 3s;pointer-events:none;"
                 alt="Müll Icon">
@@ -52,7 +52,7 @@
         <hr style="height:1px; visibility:hidden; margin-bottom:-1px;">
         <div class="generator" align="center" style="display:flex; align-items: center;justify-content: center;">
             <h5 style="color:var(--rosa);font-size:min(24px, 6vw);font-weight:500;">ODER</h5>
-            <div class="dropdown" style="margin-left:1em;margin-right:1em;" onclick="toggle_dropdown()" onfocusout="dropdown_fold()">
+            <div class="dropdown" id="dropdown" style="margin-left:1em;margin-right:1em;" onclick="toggleDropdown()" onfocusout="dropdownFold()">
                 <div class="select">
                     <span>{{ textgenerator.0 }}</span>
                 </div>
@@ -64,7 +64,7 @@
                 </ul>
             </div>
 
-            <button type="button" onclick="generieren()" id="generieren">generieren</button>
+            <button type="button" onclick="satzGenerieren()" id="generieren">generieren</button>
         </div>
     </div>
 

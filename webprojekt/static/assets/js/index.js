@@ -1,15 +1,19 @@
-const dropdown = $('.dropdown');
+const dropdown = $("#dropdown");
+const textarea = $("#textarea");
+
+var sessionId = null;
+
+
 
 //JQUERY
 /* PAGE LOAD */
-(function($) {
-
+(function ($) {
     "use strict";
     // Page loading animation
-    $(window).on('load', function() {
-        $('#js-preloader').addClass('loaded');
-        var sessionid = makeid();
-        console.log("Session-ID: " + sessionid);
+    $(window).on("load", function () {
+        $("#js-preloader").addClass("loaded");
+        sessionId = makeid();
+        console.log("Session-ID: " + sessionId);
     });
 
 })(window.jQuery);
@@ -26,34 +30,13 @@ function makeid() {
     return text;
 }
 
-
-
-/*dropdown.click(function(){$(this).attr('tabindex',1).focus();
-$(this).toggleClass('active');
-$(this).find('.dropdown-menu').slideToggle(300);});
-$('.dropdown').focusout(function(){$(this).removeClass('active');
-$(this).find('.dropdown-menu').slideUp(300);});
-
-$('.dropdown .dropdown-menu li').click(function(){$(this).parents('.dropdown').find('span').text($(this).text());
-$(this).parents('.dropdown').find('input').attr('value',$(this).attr('content'));});
-function clearTextarea(){textarea.value="";resizeTextArea();textarea.focus();weiterueben_verstecken();}
-
-*/
-//function generieren(){let generierobjekt=dropdown.find('input').val();let response=satzGeneratorBackend(generierobjekt);}
-//function satzGeneratorBackend(data){parameterUrl="/satzgenerator/?session="+sessionid;console.log(parameterUrl)
-//fetch(parameterUrl,{method:"post",body:data,headers:{"X-CSRFToken":getCookie('csrftoken'),"TEXTAREAVALUE":textarea.value.replace(/\s+/g,' ').trim(),},}).then(function(data){data.text().then(text=>{textarea.value=text;windowResize();resizeTextArea();});});}
-/* GENERATOR */
-
-
-
-
-function toggle_dropdown(){
-    dropdown.attr('tabindex',1).focus();
+function toggleDropdown() {
+    dropdown.attr('tabindex', 1).focus();
     dropdown.toggleClass("active");
     dropdown.find(".dropdown-menu").slideToggle(300);
 }
-  
-function dropdown_fold(){
+
+function dropdownFold() {
     console.log("fold");
     dropdown.removeClass("active");
     dropdown.find(".dropdown-menu").slideUp(300);
@@ -61,22 +44,66 @@ function dropdown_fold(){
 }
 
 /* Funktion: Dropdown-Item pressed */
-$('.dropdown .dropdown-menu li').click(function(){
+$('.dropdown .dropdown-menu li').click(function () {
     dropdown.find("span").text($(this).attr("content"));
     dropdown.find("input").attr("value", $(this).attr("content"))
-
 });
 
 
-
+/* get Cookie */
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        var cookies = document.cookie.split(";");
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
 /*
-$(this).parents('.dropdown').find('input').attr('value',$(this).attr('content'));});
+function satzGeneratorBackend(data)
+{parameterUrl="/satzgenerator/?session="+sessionid;
+console.log(parameterUrl);
+fetch(parameterUrl,
+    {method:"post",
+    body:data,
+    headers: {"X-CSRFToken":getCookie('csrftoken'),"TEXTAREAVALUE":textarea.value.replace(/\s+/g,' ').trim(),},})
+.then(function(data){data.text().then(text=>{textarea.value=text;windowResize();resizeTextArea();});});}
 
 */
 
+function satzGenerieren() {
+    let selectedCategory = dropdown.find("input").val();
+    console.log(selectedCategory);
 
-function generieren() {
-    let selected_category = dropdown.find("input").val();
-    console.log(selected_category);
+    parameterUrl = `/satzgenerator/?session=${sessionId}/`
+    fetch(parameterUrl, {
+        method: "post", body: selectedCategory,
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken"),
+            "currenttextarea": sonderzeichenEntfernen(textarea.val()),
+
+        }
+    }).then(function (data) {
+        data.text().then(function (text) {
+            textarea.val(text);
+            
+            //Textarea resize!
+
+        })
+
+    }
+    )
 }
+
+function sonderzeichenEntfernen(text){
+    console.log(text.toLowerCase().replace(/[^a-zA-Z ]/g, ""))
+    return text.toLowerCase().replace(/[^a-z ]/g, "")
+}
+
