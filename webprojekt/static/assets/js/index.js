@@ -4,7 +4,13 @@ const textarea = $("#textarea");
 var sessionId = null;
 
 
+var textareaMaxWidth = null;
+var textareaWidth = null;
 
+windowResize();
+/* EVENT LISTENERS */
+textarea.on('input change keyup paste', resizeTextarea);
+$(window).resize(windowResize);
 //JQUERY
 /* PAGE LOAD */
 (function ($) {
@@ -40,7 +46,6 @@ function dropdownFold() {
     console.log("fold");
     dropdown.removeClass("active");
     dropdown.find(".dropdown-menu").slideUp(300);
-
 }
 
 /* Funktion: Dropdown-Item pressed */
@@ -66,17 +71,41 @@ function getCookie(name) {
     return cookieValue;
 }
 
-/*
-function satzGeneratorBackend(data)
-{parameterUrl="/satzgenerator/?session="+sessionid;
-console.log(parameterUrl);
-fetch(parameterUrl,
-    {method:"post",
-    body:data,
-    headers: {"X-CSRFToken":getCookie('csrftoken'),"TEXTAREAVALUE":textarea.value.replace(/\s+/g,' ').trim(),},})
-.then(function(data){data.text().then(text=>{textarea.value=text;windowResize();resizeTextArea();});});}
 
-*/
+function resizeTextarea() {
+    let computedFontSize = textarea.css("font-size");
+    let fontAttr = "400 " + String(Math.max(Math.min(parseInt(computedFontSize) + 1, 50), 30)) + "px Open Sans";
+    textwidth = getTextWidth(textarea.val(), fontAttr);
+    textarea.width(Math.max(textareaWidth, Math.min(textwidth + (parseInt(computedFontSize) + 1 - 36.8), window.innerWidth * 0.95)) + 'px');
+    
+    textarea.css("height", "1.6em");
+    textarea.css("height", textarea.prop("scrollHeight") + "px");   
+}
+
+function windowResize() {
+    console.log("Maxwidth updating");
+    textareaMaxWidth= Math.min(window.innerWidth * 0.85, 750);
+    textareaWidth= Math.min(window.innerWidth * 0.85, 450);
+    textarea.css("max-width", textareaMaxWidth + "px"); 
+    console.log("Maxwidth updated");
+    resizeTextarea();
+    }
+
+
+
+
+
+
+
+function getTextWidth(text, font) {
+    // re-use canvas object for better performance
+    const canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+    const context = canvas.getContext("2d");
+    context.font = font;
+    const metrics = context.measureText(text);
+    return metrics.width;
+}
+
 
 function satzGenerieren() {
     let selectedCategory = dropdown.find("input").val();
@@ -87,22 +116,14 @@ function satzGenerieren() {
         method: "post", body: selectedCategory,
         headers: {
             "X-CSRFToken": getCookie("csrftoken"),
-            "currenttextarea": sonderzeichenEntfernen(textarea.val()),
-
+            "currenttextarea": textarea.val(),
         }
     }).then(function (data) {
         data.text().then(function (text) {
             textarea.val(text);
-            
             //Textarea resize!
-
         })
-
     }
     )
-}
-
-function sonderzeichenEntfernen(text){
-    return text.toLowerCase().replace(/[^a-zöäüß ]/g, "")
 }
 
