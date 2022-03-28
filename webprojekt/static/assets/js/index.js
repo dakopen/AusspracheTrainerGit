@@ -83,13 +83,11 @@ function resizeTextarea() {
 }
 
 function windowResize() {
-    console.log("Maxwidth updating");
     textareaMaxWidth= Math.min(window.innerWidth * 0.85, 750);
-    textareaWidth= Math.min(window.innerWidth * 0.85, 450);
     textarea.css("max-width", textareaMaxWidth + "px"); 
-    console.log("Maxwidth updated");
+    textareaWidth= Math.min(window.innerWidth * 0.85, 450);
     resizeTextarea();
-    }
+}
 
 
 
@@ -121,7 +119,7 @@ function satzGenerieren() {
     }).then(function (data) {
         data.text().then(function (text) {
             textarea.val(text);
-            //Textarea resize!
+            resizeTextarea();
         })
     }
     )
