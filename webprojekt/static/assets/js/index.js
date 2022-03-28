@@ -103,7 +103,6 @@ function satzGenerieren() {
 }
 
 function sonderzeichenEntfernen(text){
-    console.log(text.toLowerCase().replace(/[^a-zA-Z ]/g, ""))
-    return text.toLowerCase().replace(/[^a-z ]/g, "")
+    return text.toLowerCase().replace(/[^a-zöäüß ]/g, "")
 }
 

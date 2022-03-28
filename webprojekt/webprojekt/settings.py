@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
+from re import T
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -29,7 +30,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -123,7 +124,6 @@ STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-    '/var/www/static/',
 ]
 
 # Default primary key field type

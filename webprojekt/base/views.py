@@ -1,6 +1,7 @@
 import random
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
+import re
 
 def home(request):
     context = {
@@ -22,6 +23,9 @@ def get_session_id(request):
     return session_id 
     
 
+def sonderzeichen_entfernen(text):
+    return re.sub("[^a-zöäüß ]+", "", text.lower())
+
 
 def satzgenerator(request):
     session_id = get_session_id(request)
@@ -29,10 +33,7 @@ def satzgenerator(request):
     satzart = (request.body).decode("utf-8-sig")  # [Zufälligen Satz / Sch-Satz / ...]
     jetziger_satz = str(request.headers["currenttextarea"])  # *, jeder vom Benutzer eingegebene Satz
     if satzart == "Zufälligen Satz":
-        
-        # HIER RICHTIGES FILE ANGEBEN
-        # TODO: Mit lowercase (nur a-z) vergleichen.
-        with open("webprojekt//static//assets//other//random_sentences_de.txt", "r",
+        with open("static/assets/other/random_sentences_de.txt", "r",
                   encoding="utf-8-sig") as random_saetze:
             lines = random_saetze.readlines()
     elif satzart == "Sch-Satz":
@@ -44,8 +45,11 @@ def satzgenerator(request):
         lines = ["Ein Seehund sonnt sich in der Mittagssonne.", "In der Sage wird von Sandstein berichtet.", "Unser Silberbesteck hat etwas ansich.", "Die Szene wird von Susanne vorgelesen.", "In der Suppe fehlt Salz.", "Im Saal sitzt manch seltsamer Mann.", "Sonntags singen sieben Zwwerge am See lustige Lieder.", "Sie segelt schon siebzig Jahre.", "Sechs Ameisen suchen schutz unterm Baum.", "Der Zug fährt vom Zirkus ins Saarland.", "Sauerstoff ist überlebenswichtig für Säugetiere.", "Hase und Gans grasen zusammen auf der Wiese.", "Zwei Sachen noch, dann ist sie fertig.", "Im September gibt es Sauerbraten zu essen.", "Salat und Sellerie sind gesunde Lebensmittel." "Susi sagte, dass sie gerne Salat mit Mais isst.", "Morgens isst Susanne gerne Müsli mit Nüssen.", "Auf der Insel scheint die Sonne übermäßig viel.", "Hans isst gerne Bratwurst mit Senf."]
     lines = [i.strip() for i in lines]
     
-    if jetziger_satz in lines:
-        lines.remove(jetziger_satz)
+    for line in lines:
+        if sonderzeichen_entfernen(line) == jetziger_satz:
+            lines.remove(line)
+            break
+
     print(random.choice(lines).strip())
     return HttpResponse(random.choice(lines).strip())
 
