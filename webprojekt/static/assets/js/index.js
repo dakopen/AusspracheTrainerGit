@@ -1,6 +1,6 @@
 const dropdown = $("#dropdown");
 const textarea = $("#textarea");
-
+const textareaError = $("#textarea-error");
 var sessionId = null;
 
 
@@ -77,22 +77,18 @@ function resizeTextarea() {
     let fontAttr = "400 " + String(Math.max(Math.min(parseInt(computedFontSize) + 1, 50), 30)) + "px Open Sans";
     textwidth = getTextWidth(textarea.val(), fontAttr);
     textarea.width(Math.max(textareaWidth, Math.min(textwidth + (parseInt(computedFontSize) + 1 - 36.8), window.innerWidth * 0.95)) + 'px');
-    
+
     textarea.css("height", "1.6em");
-    textarea.css("height", textarea.prop("scrollHeight") + "px");   
+    textarea.css("height", textarea.prop("scrollHeight") + "px");
+    checkTextareaInputServerside(textarea.val());
 }
 
 function windowResize() {
-    textareaMaxWidth= Math.min(window.innerWidth * 0.85, 750);
-    textarea.css("max-width", textareaMaxWidth + "px"); 
-    textareaWidth= Math.min(window.innerWidth * 0.85, 450);
+    textareaMaxWidth = Math.min(window.innerWidth * 0.85, 750);
+    textarea.css("max-width", textareaMaxWidth + "px");
+    textareaWidth = Math.min(window.innerWidth * 0.85, 450);
     resizeTextarea();
 }
-
-
-
-
-
 
 
 function getTextWidth(text, font) {
@@ -125,3 +121,51 @@ function satzGenerieren() {
     )
 }
 
+function checkTextareaInput(text) {
+    if (text.length > 120) {
+        textarea.val(text.substring(0, 120));
+    }
+    // Text von Sonderzeichen entfernen
+    text = text.replace(/\s\s+/g, ' ').replace(/[`~!@^*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '').trim();
+    let fehlerListe = []
+
+    if (text.match("[^a-zA-ZäöüÄÖÜß0-9 \s\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]")) { // nicht-deutsche Zeichen verwendet
+        fehlerListe.push("Bitte nur deutsches Alphabet verwenden.")
+    }
+    if (/\d/.test(text)) { // Zahlen verwendet
+        fehlerListe.push("Bitte Zahlen ausschreiben.")
+    }
+    if (text.match("[#%&$€\x23-\x26]")) {
+        fehlerListe.push("Bitte Sonderzeichen ausschreiben.")
+    }
+    const longerThan25 = (element) => element.length > 25;
+    if (text.split(" ").some(longerThan25)) {
+        fehlerListe.push("Kein Wort darf länger als 25 Buchstaben lang sein.")
+    }
+    /*displayTextareaError(fehlerListe);*/
+}
+
+function displayTextareaError(fehlerListe) {
+    var textareaErrorText = ""
+    fehlerListe.forEach(function (item, index) {
+         textareaErrorText += item + " "
+      });
+    textareaError.html(textareaErrorText.trim())
+}
+
+function checkTextareaInputServerside(text) {
+    if (sessionId != null) {
+        parameterUrl = `/satzcheck/?session=${sessionId}/`
+        fetch(parameterUrl, {
+            method: "post", body: text,
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+            }
+        }).then(response => response.json())
+        .then(data => displayTextareaError(data));
+        
+        
+
+        
+    }
+}

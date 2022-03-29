@@ -1,7 +1,9 @@
+from distutils.command.install_egg_info import safe_name
+import imp
 import random
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
-import re
+from utils.textCheck import sonderzeichen_entfernen, check_text
 
 def home(request):
     context = {
@@ -21,10 +23,16 @@ def get_session_id(request):
     if not session_id:
         raise Exception(f"Keine session_id (session_id={session_id})")
     return session_id 
-    
 
-def sonderzeichen_entfernen(text):
-    return re.sub("[^a-zöäüß ]+", "", text.lower())
+
+def textinput_check(request):
+    session_id = get_session_id(request)
+
+    text = (request.body).decode("utf-8-sig")
+    fehler_liste = check_text(text)
+    return JsonResponse(fehler_liste, safe=False)
+
+
 
 
 def satzgenerator(request):

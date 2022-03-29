@@ -1,3 +1,9 @@
+/* allgemeine Funktionen */
+.inactive {
+    display: none;
+    opacity: 0;
+}
+
 
 
 /* TEXTAREA textarea */
@@ -106,12 +112,6 @@
     border-radius: 50%;
 }
 
-
-/*
-.glow-on-hover:active {
-    color: #000
-}*/
-
 .glow-on-hover:active:after {
     top: +2px;
     left: +2px;
@@ -158,7 +158,7 @@ img#mikrofonIcon {
 
 /* WEITERUEBEN btn */
 
-.weiterueben {
+.left-button {
     position: absolute;
     margin: auto;
     transform: translate(-50%, -50%);
@@ -174,7 +174,7 @@ img#mikrofonIcon {
 
 /* ABBRECHEN-WIEDERHOLEN btn */
 
-.abbrechen-wiederholen {
+.right-button {
     position: absolute;
     margin: auto;
     transform: translate(-50%, -50%);
@@ -272,6 +272,10 @@ img#mikrofonIcon {
 
 
 /* TODO: EINORDNEN */
+
+
+
+
 
 
 /* COLOR CLASSES */
@@ -388,7 +392,8 @@ img#mikrofonIcon {
 }
 
 .feature {
-    outline: 3px solid var(--rosa);
+    /*outline: 3px solid var(--rosa);*/
+    box-shadow: 0 0 0 2pt var(--rosa);
     height: 450px;
     width: min(85vw, 400px);
     left: 50%;

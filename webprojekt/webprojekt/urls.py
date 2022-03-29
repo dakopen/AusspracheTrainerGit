@@ -21,7 +21,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.home, name="home"),
     path("satzgenerator/", views.satzgenerator), 
-
+    path("satzcheck/", views.textinput_check),
     
     path("privacy-policy/", views.privacypolicy, name="privacy_policy"),
     path("sources/", views.sources, name="sources"),

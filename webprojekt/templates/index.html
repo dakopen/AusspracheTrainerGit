@@ -42,9 +42,9 @@
     <div>
         <p align="center">
             <textarea placeholder="Übungssatz" id="textarea" class="textarea-responsive" maxlength="120" autocapitalize="off"></textarea>
-            <input type="image" onclick="" src="{% static 'assets/images/PPP Icon Bin.svg' %}" id="clear"
-                style="position: absolute; width: 28px; height: 28px; opacity: 0; transition: opacity 3s;pointer-events:none;"
-                alt="Müll Icon">
+            <input type="image" onclick="" src="{% static 'assets/images/PPP Icon Bin.svg' %}" id="bin-icon"
+                style="position: absolute; width: 28px; height: 28px; transition: opacity 3s;pointer-events:none;"
+                alt="Mülltonne Icon">
         </p>
 
         <p align="center" id="textarea-error" class="error"></p>
@@ -84,18 +84,18 @@
 
 
     <div class="wrap-button-container">
-        <button type="button" id="weiterueben" class="weiterueben">weiter üben</button>
+        <button type="button" id="left-button" class="left-button" style="display: none;">weiter üben</button>
 
         <canvas id="waveform"
             style="position:absolute;transform: translate(-50%, -50%);left:50%;top:50%;width: 330%; border:none; outline:none; margin-top:9%;"></canvas>
         {% csrf_token %}
-        <button class="glow-on-hover" onclick="togglerecord()" id="toggle-record" value="bereit" style="margin: 0.5em;">
+        <button class="glow-on-hover" onclick="togglerecord()" id="toggle-record" value="bereit">
 
             <img id="mikrofonIcon" src="{% static 'assets/images/Mikrofon.svg' %}" style="filter: invert(1);"
                 alt="Mikrofon Icon">
 
         </button>
-        <button type="button" id="abbrechen-wiederholen" class="abbrechen-wiederholen">abbrechen</button>
+        <button type="button" id="right-button" class="right-button" style="display: none;">abbrechen</button>
 
     </div>
 
@@ -108,7 +108,11 @@
         <h1 style="font-size: min(2em, 10vw);">Dein <strong>intelligenter</strong> AusspracheTrainer</h1>
         <h4 style="line-height: 1.5em;margin-left: 5%; margin-right: 5%; font-size: max(1.5vh, 18px);">...analysiert
             einen vorgelesenen Satz auf Verständlichkeit und Sprachfehler. Er wurde in Zusammenarbeit mit Logopäden
-            entwickelt, um die Deutlichkeit im Alltag zu verbessern.</h4>
+            entwickelt, um die Deutlichkeit im Alltag zu verbessern.
+        
+
+            (Testversion)
+        </h4>
     </div>
 
     <br>
