@@ -1,4 +1,3 @@
-from os import remove
 import re   
 
 def sonderzeichen_entfernen(text):
@@ -8,7 +7,7 @@ def check_text(text):
     fehler_liste = []
     if len(text) > 120:
         raise Exception("Text ist zu lange")
-
+    raw_text = text
     text = re.sub("[`~!@^*()_|+\-=?;:,.\\\}\[\{\]<>]", " ", text)  # Sonderzeichen entfernen
     text = ' '.join(text.split())
 
@@ -24,6 +23,14 @@ def check_text(text):
     if any(wort for wort in text.split() if len(wort) > 25):
         fehler_liste.append("Kein Wort darf länger als 25 Buchstaben lang sein.")
     
+    if 119 > len(raw_text) > 100:
+        fehler_liste.append(f"Noch {120-len(raw_text)} Buchstaben verbleiben...")
+    elif len(raw_text) == 119:
+        fehler_liste.append("Noch 1 Buchstabe verbleibend.")
+    elif len(raw_text) == 120:
+        fehler_liste.append("Maximale Buchstaben erreicht.")
+
+
     return fehler_liste
 
 
