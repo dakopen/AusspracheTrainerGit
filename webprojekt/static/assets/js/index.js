@@ -175,11 +175,15 @@ function checkTextareaInputServerside(text) {
             else {
                 binIcon.removeClass("active");
                 binIcon.addClass("inactive");
-
             };
         }
             );
     }
+}
+
+function clearTextarea() {
+    textarea.val("");
+    resizeTextarea();
 }
 
 
