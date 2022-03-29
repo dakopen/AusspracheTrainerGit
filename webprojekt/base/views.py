@@ -29,10 +29,8 @@ def textinput_check(request):
     session_id = get_session_id(request)
 
     text = (request.body).decode("utf-8-sig")
-    fehler_liste = check_text(text)
-    return JsonResponse(fehler_liste, safe=False)
-
-
+    fehler_liste, bin_icon_bool = check_text(text)
+    return JsonResponse([fehler_liste, bin_icon_bool], safe=False)
 
 
 def satzgenerator(request):
@@ -60,8 +58,6 @@ def satzgenerator(request):
 
     print(random.choice(lines).strip())
     return HttpResponse(random.choice(lines).strip())
-
-
 
 
 def handler404(request, exception):

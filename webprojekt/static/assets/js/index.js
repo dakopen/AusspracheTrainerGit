@@ -1,6 +1,7 @@
 const dropdown = $("#dropdown");
 const textarea = $("#textarea");
 const textareaError = $("#textarea-error");
+const binIcon = $("#bin-icon");
 var sessionId = null;
 
 
@@ -121,6 +122,8 @@ function satzGenerieren() {
     )
 }
 
+
+/* CLIENT SIDE */
 function checkTextareaInput(text) {
     if (text.length > 120) {
         textarea.val(text.substring(0, 120));
@@ -142,7 +145,7 @@ function checkTextareaInput(text) {
     if (text.split(" ").some(longerThan25)) {
         fehlerListe.push("Kein Wort darf länger als 25 Buchstaben lang sein.")
     }
-    /*displayTextareaError(fehlerListe);*/
+    displayTextareaError(fehlerListe);
 }
 
 function displayTextareaError(fehlerListe) {
@@ -153,6 +156,7 @@ function displayTextareaError(fehlerListe) {
     textareaError.html(textareaErrorText.trim())
 }
 
+/* SERVER SIDE */
 function checkTextareaInputServerside(text) {
     if (sessionId != null) {
         parameterUrl = `/satzcheck/?session=${sessionId}/`
@@ -162,10 +166,20 @@ function checkTextareaInputServerside(text) {
                 "X-CSRFToken": getCookie("csrftoken"),
             }
         }).then(response => response.json())
-        .then(data => displayTextareaError(data));
-        
-        
+        .then(data => {
+            displayTextareaError(data[0]);
+            if (data[1]){
+                binIcon.addClass("active");
+                binIcon.removeClass("inactive")
+            }
+            else {
+                binIcon.removeClass("active");
+                binIcon.addClass("inactive");
 
-        
+            };
+        }
+            );
     }
 }
+
+

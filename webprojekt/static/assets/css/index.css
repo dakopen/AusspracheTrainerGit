@@ -1,9 +1,21 @@
-/* allgemeine Funktionen */
-.inactive {
-    display: none;
-    opacity: 0;
+/* BIN ICON */
+#bin-icon {
+    position: absolute;
+    width: 28px; 
+    height: 28px;
 }
 
+#bin-icon.inactive {
+    pointer-events:none;
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+
+#bin-icon.active {
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 2s;
+}
 
 
 /* TEXTAREA textarea */

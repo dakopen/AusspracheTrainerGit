@@ -29,8 +29,12 @@ def check_text(text):
         fehler_liste.append("Noch 1 Buchstabe verbleibend.")
     elif len(raw_text) == 120:
         fehler_liste.append("Maximale Buchstaben erreicht.")
+    
+    bin_icon_bool = show_bin_icon(len(raw_text))
 
+    return fehler_liste, bin_icon_bool
 
-    return fehler_liste
-
-
+def show_bin_icon(text_length):
+    if text_length > 5:
+        return True
+    return False
