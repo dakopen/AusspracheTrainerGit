@@ -90,7 +90,7 @@
         
         
             {% csrf_token %}
-        <button class="glow-on-hover" onclick="togglerecord()" id="toggle-record" value="bereit">
+        <button class="glow-on-hover" onclick="toggleRecording()" id="toggle-record">
 
             <img id="mikrofonIcon" src="{% static 'assets/images/Mikrofon.svg' %}" style="filter: invert(1);"
                 alt="Mikrofon Icon">
@@ -117,11 +117,18 @@
     </div>
 
     <br>
+    <br>
     
     <!-- TESTEN START -->
+    <br>
     <div style="text-align: center;">
-    <button type="button" onclick="startRecording()">starten</button>
-    <button type="button" onclick="stopRecording()">stoppen</button>
+    <button type="button" id="test1">starten</button>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <button type="button" id="test2">stoppen</button>
     </div>
     <br>
     <br>
@@ -234,8 +241,6 @@
 
     <ol id="recordingsList"></ol>
     {% include 'modules/footer.html' %}
-
-
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>

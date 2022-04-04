@@ -64,10 +64,10 @@ function setCookie(name, value, days) {
     var expires = "";
     if (days) {
         var date = new Date();
-        date.setTime(date.getTime() + (days*24*60*60*1000));
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
         expires = "; expires=" + date.toUTCString();
     }
-    document.cookie = name + "=" + (value || "")  + expires + "; path=/;SameSite=Lax";
+    document.cookie = name + "=" + (value || "") + expires + "; path=/;SameSite=Lax";
 }
 
 
@@ -165,8 +165,8 @@ function checkTextareaInput(text) {
 function displayTextareaError(fehlerListe) {
     var textareaErrorText = ""
     fehlerListe.forEach(function (item, index) {
-         textareaErrorText += item + " "
-      });
+        textareaErrorText += item + " "
+    });
     textareaError.html(textareaErrorText.trim())
 }
 
@@ -175,24 +175,24 @@ function checkTextareaInputServerside(text) {
     if (sessionId != null) {
         parameterUrl = `/satzcheck/?session=${sessionId}/`
         fetch(parameterUrl, {
-            method: "post", 
+            method: "post",
             body: text,
             headers: {
                 "X-CSRFToken": getCookie("csrftoken"),
-            mode: "same-origin"    
-        }
-        }).then(response => response.json())
-        .then(data => {
-            displayTextareaError(data[0]);
-            if (data[1]){
-                binIcon.addClass("active");
-                binIcon.removeClass("inactive")
+                mode: "same-origin"
             }
-            else {
-                binIcon.removeClass("active");
-                binIcon.addClass("inactive");
-            };
-        }
+        }).then(response => response.json())
+            .then(data => {
+                displayTextareaError(data[0]);
+                if (data[1]) {
+                    binIcon.addClass("active");
+                    binIcon.removeClass("inactive")
+                }
+                else {
+                    binIcon.removeClass("active");
+                    binIcon.addClass("inactive");
+                };
+            }
             );
     }
 }
@@ -218,47 +218,61 @@ var input;
 //MediaStreamAudioSourceNode we'll be recording 
 // shim for AudioContext when it's not avb. 
 var AudioContext = window.AudioContext || window.webkitAudioContext;
-var audioContext = new AudioContext;
+var audioContext;
 var recordingsList = document.getElementById("recordingsList");
 
-
-
+function toggleRecording() {
+    try {
+        if (rec.recording) { stopRecording(); }
+        else { startRecording(); }
+    }
+    catch (TypeError) {
+        startRecording();
+    }
+}
 
 function startRecording() {
-console.log("Recordingbutton pressed.")
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function (stream) {
+        console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
+        /* assign to gumStream for later use */
+        audioContext = new AudioContext();
 
-var constraints = {
-    audio: true,
-    video: false
-}  
+        gumStream = stream;
+        /* use the stream */
 
-navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
-    console.log("getUserMedia() success, stream created, initializing Recorder.js ..."); 
-    /* assign to gumStream for later use */
-    gumStream = stream;
-    /* use the stream */
-    input = audioContext.createMediaStreamSource(stream);
-    /* Create the Recorder object and configure to record mono sound (1 channel) Recording 2 channels will double the file size */
-    rec = new Recorder(input, {
-        numChannels: 1
-    }) 
-    //start the recording process 
-    rec.record()
-    console.log("Recording started");
-}).catch(function(err) {
-    //enable the record button if getUserMedia() fails 
-    console.log("getUserMedia() failed");
-});
+        input = audioContext.createMediaStreamSource(stream);
+        /* Create the Recorder object and configure to record mono sound (1 channel) Recording 2 channels will double the file size */
+        rec = new Recorder(input, {
+            numChannels: 1
+        })
+        //start the recording process 
+        rec.record()
+        console.log("Aufnahme gestartet...");
+        aufnahmeTimeout = setTimeout(function () {
+            console.log("Aufnahme-Timeout"); 
+            stopRecording();
+        }, 22000);
+
+
+
+
+
+    }).catch(function (err) {
+        //enable the record button if getUserMedia() fails 
+        console.log("getUserMedia() fehlgeschlagen.");
+    });
 }
-function stopRecording() {
-    console.log("stopButton clicked");
-    //disable the stop button, enable the record too allow for new recordings 
 
-    //tell the recorder to stop the recording 
-    rec.stop(); //stop microphone access 
-    gumStream.getAudioTracks()[0].stop();
-    //create the wav blob and pass it on to createDownloadLink 
-    rec.exportWAV(createDownloadLink);
+function stopRecording() {
+    //tell the recorder to stop the recording
+    if (rec.recording) {
+        clearTimeout(aufnahmeTimeout);
+        rec.stop(); //stop microphone access
+        gumStream.getAudioTracks()[0].stop();
+        //create the wav blob and pass it on to createDownloadLink 
+        rec.exportWAV(createDownloadLink);
+        console.log("Aufnahme beendet.");
+    }
 }
 
 function createDownloadLink(blob) {
@@ -278,5 +292,6 @@ function createDownloadLink(blob) {
     li.appendChild(link);
     //add the li element to the ordered list 
     recordingsList.appendChild(li);
+    console.log("Aufnahme exportiert.");
 }
 
