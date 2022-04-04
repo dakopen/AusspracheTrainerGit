@@ -11,7 +11,11 @@ var textareaWidth = null;
 
 windowResize();
 /* EVENT LISTENERS */
-textarea.on('input change keyup paste', resizeTextarea);
+textarea.on('input change keyup paste', function(){
+    resizeTextarea();
+    checkTextareaInputServerside(); 
+});
+
 $(window).resize(windowResize);
 //JQUERY
 /* PAGE LOAD */
@@ -91,7 +95,6 @@ function resizeTextarea() {
 
     textarea.css("height", "1.6em");
     textarea.css("height", textarea.prop("scrollHeight") + "px");
-    checkTextareaInputServerside(textarea.val());
 }
 
 function windowResize() {
@@ -132,32 +135,6 @@ function satzGenerieren() {
     )
 }
 
-
-/* CLIENT SIDE */
-function checkTextareaInput(text) {
-    if (text.length > 120) {
-        textarea.val(text.substring(0, 120));
-    }
-    // Text von Sonderzeichen entfernen
-    text = text.replace(/\s\s+/g, ' ').replace(/[`~!@^*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '').trim();
-    let fehlerListe = []
-
-    if (text.match("[^a-zA-ZäöüÄÖÜß0-9 \s\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]")) { // nicht-deutsche Zeichen verwendet
-        fehlerListe.push("Bitte nur deutsches Alphabet verwenden.")
-    }
-    if (/\d/.test(text)) { // Zahlen verwendet
-        fehlerListe.push("Bitte Zahlen ausschreiben.")
-    }
-    if (text.match("[#%&$€\x23-\x26]")) {
-        fehlerListe.push("Bitte Sonderzeichen ausschreiben.")
-    }
-    const longerThan25 = (element) => element.length > 25;
-    if (text.split(" ").some(longerThan25)) {
-        fehlerListe.push("Kein Wort darf länger als 25 Buchstaben lang sein.")
-    }
-    displayTextareaError(fehlerListe);
-}
-
 function displayTextareaError(fehlerListe) {
     var textareaErrorText = ""
     fehlerListe.forEach(function (item, index) {
@@ -167,12 +144,12 @@ function displayTextareaError(fehlerListe) {
 }
 
 /* SERVER SIDE */
-function checkTextareaInputServerside(text) {
+function checkTextareaInputServerside() {
     if (sessionId != null) {
         parameterUrl = `/satzcheck/?session=${sessionId}`
         fetch(parameterUrl, {
             method: "post",
-            body: text,
+            body: textarea.val(),
             headers: {
                 "X-CSRFToken": getCookie("csrftoken"),
                 mode: "same-origin"
