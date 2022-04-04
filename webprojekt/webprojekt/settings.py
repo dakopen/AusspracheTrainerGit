@@ -132,4 +132,4 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # TESTING:
-CSRF_TRUSTED_ORIGINS = ["http://bs-local.com:8000"]
+CSRF_TRUSTED_ORIGINS = ["http://bs-local.com:8000", "https://bs-local.com:8000", "http://bs-local.com", "http://127.0.0.1", "http://127.0.0.1:8000"]

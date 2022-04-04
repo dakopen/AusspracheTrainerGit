@@ -21,6 +21,8 @@ $(window).resize(windowResize);
         $("#js-preloader").addClass("loaded");
         sessionId = makeid();
         console.log("Session-ID: " + sessionId);
+        clearTextarea();
+        console.log("CSRF-Token: " + getCookie("csrftoken"));
     });
 
 })(window.jQuery);
@@ -57,6 +59,18 @@ $('.dropdown .dropdown-menu li').click(function () {
 
 
 /* get Cookie */
+
+function setCookie(name, value, days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days*24*60*60*1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "")  + expires + "; path=/;SameSite=Lax";
+}
+
+
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie !== "") {
@@ -161,10 +175,12 @@ function checkTextareaInputServerside(text) {
     if (sessionId != null) {
         parameterUrl = `/satzcheck/?session=${sessionId}/`
         fetch(parameterUrl, {
-            method: "post", body: text,
+            method: "post", 
+            body: text,
             headers: {
                 "X-CSRFToken": getCookie("csrftoken"),
-            }
+            mode: "same-origin"    
+        }
         }).then(response => response.json())
         .then(data => {
             displayTextareaError(data[0]);
@@ -186,4 +202,81 @@ function clearTextarea() {
     resizeTextarea();
 }
 
+/* AUDIO */
+// see: https://blog.addpipe.com/using-recorder-js-to-capture-wav-audio-in-your-html5-web-site/
+
+
+
+
+//webkitURL is deprecated but nevertheless 
+URL = window.URL || window.webkitURL;
+var gumStream;
+//stream from getUserMedia() 
+var rec;
+//Recorder.js object 
+var input;
+//MediaStreamAudioSourceNode we'll be recording 
+// shim for AudioContext when it's not avb. 
+var AudioContext = window.AudioContext || window.webkitAudioContext;
+var audioContext = new AudioContext;
+var recordingsList = document.getElementById("recordingsList");
+
+
+
+
+function startRecording() {
+console.log("Recordingbutton pressed.")
+
+var constraints = {
+    audio: true,
+    video: false
+}  
+
+navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+    console.log("getUserMedia() success, stream created, initializing Recorder.js ..."); 
+    /* assign to gumStream for later use */
+    gumStream = stream;
+    /* use the stream */
+    input = audioContext.createMediaStreamSource(stream);
+    /* Create the Recorder object and configure to record mono sound (1 channel) Recording 2 channels will double the file size */
+    rec = new Recorder(input, {
+        numChannels: 1
+    }) 
+    //start the recording process 
+    rec.record()
+    console.log("Recording started");
+}).catch(function(err) {
+    //enable the record button if getUserMedia() fails 
+    console.log("getUserMedia() failed");
+});
+}
+function stopRecording() {
+    console.log("stopButton clicked");
+    //disable the stop button, enable the record too allow for new recordings 
+
+    //tell the recorder to stop the recording 
+    rec.stop(); //stop microphone access 
+    gumStream.getAudioTracks()[0].stop();
+    //create the wav blob and pass it on to createDownloadLink 
+    rec.exportWAV(createDownloadLink);
+}
+
+function createDownloadLink(blob) {
+    var url = URL.createObjectURL(blob);
+    var au = document.createElement('audio');
+    var li = document.createElement('li');
+    var link = document.createElement('a');
+    //add controls to the <audio> element 
+    au.controls = true;
+    au.src = url;
+    //link the a element to the blob 
+    link.href = url;
+    link.download = new Date().toISOString() + '.wav';
+    link.innerHTML = link.download;
+    //add the new audio and a elements to the li element 
+    li.appendChild(au);
+    li.appendChild(link);
+    //add the li element to the ordered list 
+    recordingsList.appendChild(li);
+}
 
