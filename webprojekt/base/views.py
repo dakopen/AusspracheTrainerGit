@@ -1,15 +1,19 @@
-from distutils.command.install_egg_info import safe_name
-import imp
-import django.middleware.csrf as dcsrf
+from sqlite3 import Timestamp
+import sys
+import secrets
 import random
-from django.shortcuts import render, redirect
-from django.http import JsonResponse, HttpResponse
-from utils.textCheck import sonderzeichen_entfernen, check_text
+from distutils.command.install_egg_info import safe_name
 
+import django.middleware.csrf as dcsrf
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from utils.textCheck import check_text, sonderzeichen_entfernen, save_raw_targetsatz
+from utils.audio import generate_time_stamp
 
 
 def home(request):
+    request.session["id"] = secrets.token_urlsafe(6)
     context = {
         "textgenerator": [
             "Zufälligen Satz",
@@ -17,20 +21,30 @@ def home(request):
             "S-Satz",
             "Ch-Satz",
             # Satz des Tages
-        ]
+        ],
+        "session_id": request.session["id"]
     }
     return render(request, '../templates/index.html', context=context)
 
 
+
 def get_session_id(request):
     session_id = request.GET.get("session", None)
-    if not session_id:
-        raise Exception(f"Keine session_id (session_id={session_id})")
-    return session_id 
+    try:
+        if session_id != request.session["id"]:
+            del request.session["id"]
+            return None
+        return session_id 
+    except KeyError:
+        return None
+    
+
 
 @csrf_exempt
 def textinput_check(request):
     session_id = get_session_id(request)
+    if not session_id:
+        return redirect("/")
 
     text = (request.body).decode("utf-8-sig")
     fehler_liste, bin_icon_bool = check_text(text)
@@ -61,6 +75,20 @@ def satzgenerator(request):
             break
 
     return HttpResponse(random.choice(lines).strip())
+
+
+def audio(request):
+    session_id = get_session_id(request)
+    if sys.getsizeof(request.body) < 1000:
+        return HttpResponse("Die Audioaufnahme ist zu kurz. Bitte erneut aufnehmen.")
+    
+    timestamp = generate_time_stamp()
+    request.session["rawtargetsatz_%s" % session_id] = save_raw_targetsatz(request.META["HTTP_TARGETSATZ"])
+    print(request.session["rawtargetsatz_%s" % session_id])
+
+    return HttpResponse("Audio empfangen")
+
+
 
 
 def handler404(request, exception):

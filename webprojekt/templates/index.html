@@ -117,22 +117,7 @@
     </div>
 
     <br>
-    <br>
     
-    <!-- TESTEN START -->
-    <br>
-    <div style="text-align: center;">
-    <button type="button" id="test1">starten</button>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <button type="button" id="test2">stoppen</button>
-    </div>
-    <br>
-    <br>
-    <!-- TESTEN ENDE -->
 
     <div class="features" style="margin:auto;height: 450px; width:min(85vw, 400px);">
         <div class="feature active">
@@ -238,6 +223,8 @@
             </div>
         </div>
     </div>
+
+    <input type="hidden" id="sessionId" name="sessionId" value={{ session_id }}> 
 
     <ol id="recordingsList"></ol>
     {% include 'modules/footer.html' %}

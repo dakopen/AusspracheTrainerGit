@@ -20,7 +20,7 @@ $(window).resize(windowResize);
     // Page loading animation
     $(window).on("load", function () {
         $("#js-preloader").addClass("loaded");
-        sessionId = makeid();
+        sessionId = retrieveId();
         console.log("Session-ID: " + sessionId);
         clearTextarea();
         console.log("CSRF-Token: " + getCookie("csrftoken"));
@@ -31,13 +31,8 @@ $(window).resize(windowResize);
 
 /* SESSION ID */
 // https://stackoverflow.com/questions/48095737/django-new-session-for-each-browser-tab/48112774
-function makeid() {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    for (var i = 0; i < 8; i++)
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    return text;
+function retrieveId() {
+    return document.getElementById("sessionId").value
 }
 
 function toggleDropdown() {
@@ -121,7 +116,7 @@ function satzGenerieren() {
     let selectedCategory = dropdown.find("input").val();
     console.log(selectedCategory);
 
-    parameterUrl = `/satzgenerator/?session=${sessionId}/`
+    parameterUrl = `/satzgenerator/?session=${sessionId}`
     fetch(parameterUrl, {
         method: "post", body: selectedCategory,
         headers: {
@@ -174,7 +169,7 @@ function displayTextareaError(fehlerListe) {
 /* SERVER SIDE */
 function checkTextareaInputServerside(text) {
     if (sessionId != null) {
-        parameterUrl = `/satzcheck/?session=${sessionId}/`
+        parameterUrl = `/satzcheck/?session=${sessionId}`
         fetch(parameterUrl, {
             method: "post",
             body: text,
@@ -232,10 +227,10 @@ function toggleRecording() {
 function startRecording() {
     navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function (stream) {
         console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
-        
+
         /* Aktives Mikrofon Bild */
         mikrofonIcon.attr("src", "/static/assets/images/Mikrofon_aktiv.svg");
-        mikrofonIcon.css({"width": "80%", "height": "80%"});
+        mikrofonIcon.css({ "width": "80%", "height": "80%" });
         /* assign to gumStream for later use */
         audioContext = new AudioContext();
 
@@ -251,7 +246,7 @@ function startRecording() {
         rec.record()
         console.log("Aufnahme gestartet...");
         aufnahmeTimeout = setTimeout(function () {
-            console.log("Aufnahme-Timeout"); 
+            console.log("Aufnahme-Timeout");
             stopRecording();
         }, 22000);
 
@@ -270,12 +265,13 @@ function stopRecording() {
     if (rec.recording) {
         clearTimeout(aufnahmeTimeout);
         mikrofonIcon.attr("src", "static/assets/images/Mikrofon.svg");
-        mikrofonIcon.css({"width": "62%", "height": "62%"});
+        mikrofonIcon.css({ "width": "62%", "height": "62%" });
 
         rec.stop(); //stop microphone access
         gumStream.getAudioTracks()[0].stop();
         //create the wav blob and pass it on to createDownloadLink 
         rec.exportWAV(createDownloadLink);
+        rec.exportWAV(sendData);
         console.log("Aufnahme beendet.");
     }
 }
@@ -299,4 +295,41 @@ function createDownloadLink(blob) {
     recordingsList.appendChild(li);
     console.log("Aufnahme exportiert.");
 }
+
+/* SPÄTER: erneutes Anhören */
+function createAudioObject(blob) {
+    var url = URL.createObjectURL(blob);
+    audioObjectListenAgain = document.createElement('audio');
+    audioObjectListenAgain.controls = true;
+    audioObjectListenAgain.src = url;
+}   // ENDE SPÄTER
+
+
+function sendData(data) {
+    createAudioObject(data);
+    console.log("Sendet Audio Dateien ans Backend");
+    parameterUrl = `/audio/?session=${sessionId}`;
+    fetch(parameterUrl,
+        {
+            method: "post",
+            body: data,
+            headers: {
+                "X-CSRFToken": getCookie('csrftoken'),
+                "TARGETSATZ": encodeURIComponent(textarea.val()),
+            },
+        }
+    ).then(function (data) {
+        data.text().then(text => {
+            if (text != "Audio empfangen") {
+                //aufnehmenErrorMessage.style.opacity = 1;
+                //aufnehmenErrorMessage.innerHTML = text;
+            }
+        })
+    })
+}
+
+
+
+
+
 

@@ -1,7 +1,9 @@
 import re   
+from urllib.parse import unquote
 
 def sonderzeichen_entfernen(text):
     return re.sub("[^a-zöäüß ]+", "", text.lower())
+
 
 def check_text(text):
     fehler_liste = []
@@ -34,7 +36,12 @@ def check_text(text):
 
     return fehler_liste, bin_icon_bool
 
+
 def show_bin_icon(text_length):
     if text_length > 5:
         return True
     return False
+
+
+def save_raw_targetsatz(HTTP_TARGETSATZ):
+    return re.sub("\s\s+", " ", str(unquote(str(HTTP_TARGETSATZ)))).strip()
