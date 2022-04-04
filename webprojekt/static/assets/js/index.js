@@ -2,6 +2,7 @@ const dropdown = $("#dropdown");
 const textarea = $("#textarea");
 const textareaError = $("#textarea-error");
 const binIcon = $("#bin-icon");
+const mikrofonIcon = $("#mikrofon-icon");
 var sessionId = null;
 
 
@@ -205,9 +206,6 @@ function clearTextarea() {
 /* AUDIO */
 // see: https://blog.addpipe.com/using-recorder-js-to-capture-wav-audio-in-your-html5-web-site/
 
-
-
-
 //webkitURL is deprecated but nevertheless 
 URL = window.URL || window.webkitURL;
 var gumStream;
@@ -234,6 +232,10 @@ function toggleRecording() {
 function startRecording() {
     navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function (stream) {
         console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
+        
+        /* Aktives Mikrofon Bild */
+        mikrofonIcon.attr("src", "/static/assets/images/Mikrofon_aktiv.svg");
+        mikrofonIcon.css({"width": "80%", "height": "80%"});
         /* assign to gumStream for later use */
         audioContext = new AudioContext();
 
@@ -267,6 +269,9 @@ function stopRecording() {
     //tell the recorder to stop the recording
     if (rec.recording) {
         clearTimeout(aufnahmeTimeout);
+        mikrofonIcon.attr("src", "static/assets/images/Mikrofon.svg");
+        mikrofonIcon.css({"width": "62%", "height": "62%"});
+
         rec.stop(); //stop microphone access
         gumStream.getAudioTracks()[0].stop();
         //create the wav blob and pass it on to createDownloadLink 
