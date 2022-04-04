@@ -1,11 +1,13 @@
 from distutils.command.install_egg_info import safe_name
 import imp
+import django.middleware.csrf as dcsrf
 import random
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from utils.textCheck import sonderzeichen_entfernen, check_text
 
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+
 
 def home(request):
     context = {
@@ -26,16 +28,15 @@ def get_session_id(request):
         raise Exception(f"Keine session_id (session_id={session_id})")
     return session_id 
 
+@csrf_exempt
 def textinput_check(request):
-    csrf_token = request.META.get("CSRF_COOKIE")
-
     session_id = get_session_id(request)
 
     text = (request.body).decode("utf-8-sig")
     fehler_liste, bin_icon_bool = check_text(text)
     return JsonResponse([fehler_liste, bin_icon_bool], safe=False)
 
-
+@csrf_exempt
 def satzgenerator(request):
     session_id = get_session_id(request)
 
