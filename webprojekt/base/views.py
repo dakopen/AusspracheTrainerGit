@@ -79,9 +79,14 @@ def satzgenerator(request):
 
 def audio(request):
     session_id = get_session_id(request)
+
+    print(sys.getsizeof(request.body), "SIZE OF FILE")
     if sys.getsizeof(request.body) < 1000:
         return HttpResponse("Die Audioaufnahme ist zu kurz. Bitte erneut aufnehmen.")
     
+    elif sys.getsizeof(request.body) > 2300000:  # 2203725 maximale Größe auf Windows 11 Firefox TODO: Checken, ob es eine allgemeine Größe ist
+        return HttpResponse("Die Audioaufnahme ist zu lang. Bitte erneut aufnehmen.")
+
     timestamp = generate_time_stamp()
     request.session["rawtargetsatz_%s" % session_id] = save_raw_targetsatz(request.META["HTTP_TARGETSATZ"])
     if not request.session["rawtargetsatz_%s" % session_id]:

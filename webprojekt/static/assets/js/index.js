@@ -5,7 +5,8 @@ const binIcon = $("#bin-icon");
 const mikrofonIcon = $("#mikrofon-icon");
 const aufnehmenErrorMessage = $("#aufnehmen-fehlermeldung");
 var sessionId = null;
-
+var remainingInterval = null;
+var secondsPassed = 0;
 
 var textareaMaxWidth = null;
 var textareaWidth = null;
@@ -236,10 +237,11 @@ function startRecording() {
         //start the recording process 
         rec.record()
         console.log("Aufnahme gestartet...");
+        remainingInterval = setInterval(secondsRemaining, 1000);
         aufnahmeTimeout = setTimeout(function () {
             console.log("Aufnahme-Timeout");
             stopRecording();
-        }, 22000);
+        }, 23000);
 
 
 
@@ -255,6 +257,8 @@ function stopRecording() {
     //tell the recorder to stop the recording
     if (rec.recording) {
         clearTimeout(aufnahmeTimeout);
+        secondsPassed = 0;
+        clearInterval(remainingInterval);
         mikrofonIcon.attr("src", "static/assets/images/Mikrofon.svg");
         mikrofonIcon.css({ "width": "62%", "height": "62%" });
 
@@ -298,6 +302,20 @@ function sendData(data) {
     })
 }
 
+function secondsRemaining(audiolaenge){
+    secondsPassed++;
+    
+    audiolaenge = 21 - secondsPassed;
+    if (audiolaenge < 10 && audiolaenge > 1){
+        displayAufnahmeFehler(`Noch ${audiolaenge} Sekunden`);
+    }
+    else if (audiolaenge == 1){
+        displayAufnahmeFehler(`Noch ${audiolaenge} Sekunde`);
+    }
+    else hideAufnahmeFehler();
+
+}
+
 function displayAufnahmeFehler(fehler){
     aufnehmenErrorMessage.css("opacity", "1");
     aufnehmenErrorMessage.html(fehler);
@@ -311,6 +329,9 @@ function hideAufnahmeFehler(){
 
     }
 }
+
+
+
 
 
 
