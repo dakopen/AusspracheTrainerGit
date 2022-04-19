@@ -111,24 +111,16 @@ def result(request):
 
         audioverarbeiter = Audioverarbeitung(str(request.session["audiopath_%s" % session_id]), str(request.session["cleantargetsatz_%s" % session_id]), str(request.session["audiopath_%s" % session_id]))
 
-
         future_google = executor.submit(audioverarbeiter.google)
         future_ibm = executor.submit(audioverarbeiter.IBM)
         future_at = executor.submit(audioverarbeiter.AT)
 
-
         target_ipa = executor.submit(audioverarbeiter.ipa.text_zu_IPA, audioverarbeiter.ipa.text_preparation(str(request.session["cleantargetsatz_%s" % session_id])))
         print(target_ipa)
-        #future_aussprachetrainer_KI = executor.submit(AudioProcessing.aussprachetrainer_KI, str(request.session["audiopath_%s" % session_id]))
-        #future_google_KI = executor.submit(AudioProcessing.google_KI, str(request.session["audiopath_%s" % session_id]))
-        #future_ibm_KI = executor.submit(AudioProcessing.ibm_KI, [str(request.session["audiopath_%s" % session_id]), str(request.session["cleantargetsatz_%s" % session_id]).split()])
-
-        #target_to_IPA = executor.submit(AudioProcessing.ipa.text_zu_IPA, AudioProcessing.ipa.text_preparation(str(request.session["cleantargetsatz_%s" % session_id])))
-        #print("TARGET:", target_to_IPA.result()[0])
-        #print("IPA_ZUORDNUNG:", target_to_IPA.result()[1])
         executor.shutdown()
         print(target_ipa.result())
-
+        print(future_google.result())
+        print(future_ibm.result())
         audioverarbeiter.delete_audio()
 
 
