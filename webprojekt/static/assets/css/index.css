@@ -60,7 +60,7 @@
 
 /* RESPONSEAREA-RESPONSIVE div */
 
-.responseArea-responsive {
+.responsearea-responsive {
     padding-left: 0.5em;
     padding-right: 0.5em;
     line-height: 1em;
@@ -69,9 +69,45 @@
     border-radius: 30px;
     border: solid 4px var(--rosa);
     font-size: max(min(2vw, 25px), 20px);
-    height: 1.6em;
+    left: 50%;
+    transform: translate(-50%, -15px);
+    position: relative;
+    transition: 1.5s;
+    background-color: white;
+    margin-top: 2em;
 }
 
+.responsearea-responsive.inactive {
+    min-height: 0px !important;
+    height: 0px !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.responsearea-responsive.active {
+    visibility: unset !important;
+    opacity: 1 !important;
+}
+
+.responsearea-responsive #responseText {
+    margin: 0;
+    padding: 0;
+    top: 0;
+    left: 0;
+    width: 50%;
+}
+
+
+#loading-symbol {
+    max-height:80%;
+    max-width:50%;
+    position:absolute;
+    top:50%;
+    left: 75%;
+    transform: translate(-50%, -50%);
+    transition: 0.2s;
+    pointer-events:none;
+}
 
 /* AUFNEHMEN div */
 
@@ -201,16 +237,13 @@ img#mikrofon-icon {
     font-size: max(min(3vw, 30px), 18px);
     outline: none;
     transition: .75s;
-}
-
-#right-button.inactive {
     opacity: 0;
     visibility: hidden;
 }
 
 #right-button.active {
-    opacity: 1;
-    visibility: unset;
+    opacity: 1 !important;
+    visibility: unset !important;
 }
 
 
@@ -507,6 +540,8 @@ img#mikrofon-icon {
     transform: translate(-30%, -50%);
     float: left;
 }
+
+
 
 #js-preloader {
     background-color: var(--white);

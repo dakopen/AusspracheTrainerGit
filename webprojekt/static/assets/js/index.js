@@ -1,10 +1,12 @@
 const dropdown = $("#dropdown");
 const textarea = $("#textarea");
+const responsearea = $("#responsearea");
 const textareaError = $("#textarea-error");
 const binIcon = $("#bin-icon");
 const mikrofonIcon = $("#mikrofon-icon");
 const aufnehmenErrorMessage = $("#aufnehmen-fehlermeldung");
 const rightButton = $("#right-button");
+const responseText = $("#responseText");
 var sessionId = null;
 var remainingInterval = null;
 var secondsPassed = 0;
@@ -20,6 +22,7 @@ textarea.on('input change keyup paste', function(){
     resizeTextarea();
     checkTextareaInputServerside();
     hideAufnahmeFehler();
+    hideResponsearea();
 });
 
 $(window).resize(windowResize);
@@ -101,6 +104,12 @@ function resizeTextarea() {
 
     textarea.css("height", "1.6em");
     textarea.css("height", textarea.prop("scrollHeight") + "px");
+
+    resizeResponsearea();
+}
+
+function resizeResponsearea() {
+    responsearea.width(Math.min(parseFloat(textarea.width()), parseInt(textarea.css("max-width"))) + "px");
 }
 
 function windowResize() {
@@ -262,6 +271,7 @@ function startRecording() {
     }).catch(function (err) {
         //enable the record button if getUserMedia() fails 
         console.log("getUserMedia() fehlgeschlagen.");
+        displayAufnahmeFehler("Bitte erlaube den Zugriff aud das Mikrofon");
     });
 }
 
@@ -286,20 +296,32 @@ function abortRecording() {
 }
 
 function stopRecording() {
-    //tell the recorder to stop the recording
     if (rec.recording) {
         endRecordingState();
         rec.exportWAV(sendData);
         console.log("Aufnahme beendet.");
+        displayResponsearea();
     }
 }
 
 
 function toggleRightButton(){
     rightButton.toggleClass("active");
-    rightButton.toggleClass("inactive");
 }
 
+function hideResponsearea() {
+    responsearea.removeClass("active");
+    responsearea.addClass("inactive");
+}
+
+function displayResponsearea() {
+    responsearea.removeClass("inactive");
+    responsearea.addClass("active");
+
+    responsearea.height("auto");
+    responsearea.css("min-height", "250px");
+    responsearea.css("font-size", parseFloat(textarea.css("font-size")) / 1.5 + "px")
+}
 
 
 /* SPÄTER: erneutes Anhören */
@@ -328,13 +350,33 @@ function sendData(data) {
         data.text().then(text => {
             if (text != "Audio empfangen") {
                 displayAufnahmeFehler(text);
-
+            }
+            else {
+                receiveResponse();
+                responseText.html("Audio an AusspracheTrainerIPAKI, Google und IBM senden...");
             }
         })
     })
 }
 
-function secondsRemaining(audiolaenge){
+function receiveResponse() {
+    parameterUrl = `/result/?session=${sessionId}`;
+    fetch(parameterUrl,
+        {
+            method: "post",
+            headers: {
+                "X-CSRFToken": getCookie('csrftoken'),
+            },
+        }
+    ).then(function (data) {
+        responseText.html("Aussprache wird analysiert...");
+        data.text().then(text => {
+            console.log(text);
+        })
+    })
+}
+
+function secondsRemaining(audiolaenge) {
     secondsPassed++;
     displayAufnahmeFehler("Zum Beenden erneut drücken...")
     audiolaenge = 21 - secondsPassed;
@@ -344,7 +386,6 @@ function secondsRemaining(audiolaenge){
     else if (audiolaenge == 1){
         displayAufnahmeFehler(`Zum Beenden erneut drücken... Noch ${audiolaenge} Sekunde`);
     }
-
 }
 
 function displayAufnahmeFehler(fehler){
@@ -356,8 +397,6 @@ function hideAufnahmeFehler(){
     if (aufnehmenErrorMessage.html()) {
         aufnehmenErrorMessage.css("opacity", "0");
         aufnehmenErrorMessage.html("");
-        
-
     }
 }
 
@@ -368,13 +407,3 @@ function minimize_waveform() {
 function maximize_waveform() {
     waveform.style.width = "330%";
 }
-
-
-
-
-
-
-
-
-
-
