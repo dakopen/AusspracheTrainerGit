@@ -23,6 +23,8 @@ urlpatterns = [
     path("satzgenerator/", views.satzgenerator), 
     path("satzcheck/", views.textinput_check),
     path("audio/", views.audio),
+    path("result/", views.result),
+
 
     path("privacy-policy/", views.privacypolicy, name="privacy_policy"),
     path("sources/", views.sources, name="sources"),

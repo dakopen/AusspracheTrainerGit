@@ -2,15 +2,16 @@ from sqlite3 import Timestamp
 import sys
 import secrets
 import random
-from distutils.command.install_egg_info import safe_name
-
-import django.middleware.csrf as dcsrf
+import concurrent.futures
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from utils.textCheck import check_text, sonderzeichen_entfernen, save_raw_targetsatz, clean_targetsatz
-from utils.audio import generate_time_stamp
+from utils.audio import generate_time_stamp, Audioverarbeitung
+from time import sleep
+import logging
 
+logging.basicConfig(filename='test.log', encoding='utf-8-sig', level=logging.DEBUG)
 
 def home(request):
     request.session["id"] = secrets.token_urlsafe(6)
@@ -79,19 +80,20 @@ def satzgenerator(request):
 
 def audio(request):
     session_id = get_session_id(request)
-
     if sys.getsizeof(request.body) < 1000:
+        logging.debug(f"Aufnahme ist zu kurz: request.body: {sys.getsizeof(request.body)} | {session_id}")
         return HttpResponse("Die Audioaufnahme ist zu kurz. Bitte erneut aufnehmen.")
-    
     elif sys.getsizeof(request.body) > 2300000:  # 2203725 maximale Größe auf Windows 11 Firefox TODO: Checken, ob es eine allgemeine Größe ist
         return HttpResponse("Die Audioaufnahme ist zu lang. Bitte erneut aufnehmen.")
 
     timestamp = generate_time_stamp()
     request.session["rawtargetsatz_%s" % session_id] = save_raw_targetsatz(request.META["HTTP_TARGETSATZ"])
     if not request.session["rawtargetsatz_%s" % session_id]:
+        logging.debug(f"Not request.session[rawtargetsatz]: {request.session['rawtargetsatz_%s' % session_id]}  | {session_id}")
         return HttpResponse("Bitte gib einen Übungssatz ein.")
 
     elif check_text(request.session["rawtargetsatz_%s" % session_id])[0]:
+        logging.debug(f"Check_Text Fehler in request.session[rawtargetsatz]: {request.session['rawtargetsatz_%s' % session_id]}  | {session_id}")
         return HttpResponse("Bitte überprüfe den Übungssatz.")
 
     request.session["cleantargetsatz_%s" % session_id] = clean_targetsatz(request.META["HTTP_TARGETSATZ"])
@@ -99,14 +101,41 @@ def audio(request):
 
     with open(request.session["audiopath_%s" % session_id], "wb") as audiofile:
         audiofile.write(request.body)
-        
-
-    # TODO: AUDIO AUFNEHMEN UND AN GOOGLE, AT & IBM GEBEN
-    # siehe: https://dakopen.kanbantool.com/b/785103#?
 
     return HttpResponse("Audio empfangen")
 
+def result(request):
+    session_id = get_session_id(request)
 
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+
+        audioverarbeiter = Audioverarbeitung(str(request.session["audiopath_%s" % session_id]), str(request.session["cleantargetsatz_%s" % session_id]), str(request.session["audiopath_%s" % session_id]))
+
+
+        future_google = executor.submit(audioverarbeiter.google)
+        future_ibm = executor.submit(audioverarbeiter.IBM)
+        future_at = executor.submit(audioverarbeiter.AT)
+
+
+        target_ipa = executor.submit(audioverarbeiter.ipa.text_zu_IPA, audioverarbeiter.ipa.text_preparation(str(request.session["cleantargetsatz_%s" % session_id])))
+        print(target_ipa)
+        #future_aussprachetrainer_KI = executor.submit(AudioProcessing.aussprachetrainer_KI, str(request.session["audiopath_%s" % session_id]))
+        #future_google_KI = executor.submit(AudioProcessing.google_KI, str(request.session["audiopath_%s" % session_id]))
+        #future_ibm_KI = executor.submit(AudioProcessing.ibm_KI, [str(request.session["audiopath_%s" % session_id]), str(request.session["cleantargetsatz_%s" % session_id]).split()])
+
+        #target_to_IPA = executor.submit(AudioProcessing.ipa.text_zu_IPA, AudioProcessing.ipa.text_preparation(str(request.session["cleantargetsatz_%s" % session_id])))
+        #print("TARGET:", target_to_IPA.result()[0])
+        #print("IPA_ZUORDNUNG:", target_to_IPA.result()[1])
+        executor.shutdown()
+        print(target_ipa.result())
+
+        audioverarbeiter.delete_audio()
+
+
+
+
+
+    return HttpResponse("<span><em>HTML</em> result</span>")
 
 
 def handler404(request, exception):

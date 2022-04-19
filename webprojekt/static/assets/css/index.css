@@ -107,6 +107,11 @@
     transform: translate(-50%, -50%);
     transition: 0.2s;
     pointer-events:none;
+    display: unset;
+}
+
+#loading-symbol.inactive {
+    display: none;
 }
 
 /* AUFNEHMEN div */

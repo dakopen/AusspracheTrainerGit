@@ -7,6 +7,7 @@ const mikrofonIcon = $("#mikrofon-icon");
 const aufnehmenErrorMessage = $("#aufnehmen-fehlermeldung");
 const rightButton = $("#right-button");
 const responseText = $("#responseText");
+const loadingSymbol = $("#loading-symbol");
 var sessionId = null;
 var remainingInterval = null;
 var secondsPassed = 0;
@@ -353,6 +354,8 @@ function sendData(data) {
             }
             else {
                 receiveResponse();
+                console.log("receiveResponse startet");
+                loadingSymbol.removeClass("inactive");
                 responseText.html("Audio an AusspracheTrainerIPAKI, Google und IBM senden...");
             }
         })
@@ -372,6 +375,9 @@ function receiveResponse() {
         responseText.html("Aussprache wird analysiert...");
         data.text().then(text => {
             console.log(text);
+            responseText.html(text);
+            loadingSymbol.addClass("inactive");
+
         })
     })
 }
