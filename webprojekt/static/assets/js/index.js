@@ -3,6 +3,7 @@ const textarea = $("#textarea");
 const textareaError = $("#textarea-error");
 const binIcon = $("#bin-icon");
 const mikrofonIcon = $("#mikrofon-icon");
+const aufnehmenErrorMessage = $("#aufnehmen-fehlermeldung");
 var sessionId = null;
 
 
@@ -13,7 +14,8 @@ windowResize();
 /* EVENT LISTENERS */
 textarea.on('input change keyup paste', function(){
     resizeTextarea();
-    checkTextareaInputServerside(); 
+    checkTextareaInputServerside();
+    hideAufnahmeFehler();
 });
 
 $(window).resize(windowResize);
@@ -130,6 +132,8 @@ function satzGenerieren() {
         data.text().then(function (text) {
             textarea.val(text);
             resizeTextarea();
+            hideAufnahmeFehler();
+
         })
     }
     )
@@ -194,11 +198,21 @@ var recordingsList = document.getElementById("recordingsList");
 function toggleRecording() {
     try {
         if (rec.recording) { stopRecording(); }
-        else { startRecording(); }
+        else { finalTextareaCheckBeforeRecording(); }
     }
-    catch (TypeError) {
-        startRecording();
+    catch (TypeError) {        
+        finalTextareaCheckBeforeRecording();
     }
+}
+
+function finalTextareaCheckBeforeRecording(){
+    if (!textarea.val()) {
+        displayAufnahmeFehler("Bitte erst einen Übungssatz eingeben.");
+    }
+    else if (textareaError.html()){
+        displayAufnahmeFehler("Bitte überprüfe den Übungssatz.");
+    }
+    else startRecording();
 }
 
 function startRecording() {
@@ -246,32 +260,11 @@ function stopRecording() {
 
         rec.stop(); //stop microphone access
         gumStream.getAudioTracks()[0].stop();
-        //create the wav blob and pass it on to createDownloadLink 
-        rec.exportWAV(createDownloadLink);
         rec.exportWAV(sendData);
         console.log("Aufnahme beendet.");
     }
 }
 
-function createDownloadLink(blob) {
-    var url = URL.createObjectURL(blob);
-    var au = document.createElement('audio');
-    var li = document.createElement('li');
-    var link = document.createElement('a');
-    //add controls to the <audio> element 
-    au.controls = true;
-    au.src = url;
-    //link the a element to the blob 
-    link.href = url;
-    link.download = new Date().toISOString() + '.wav';
-    link.innerHTML = link.download;
-    //add the new audio and a elements to the li element 
-    li.appendChild(au);
-    li.appendChild(link);
-    //add the li element to the ordered list 
-    recordingsList.appendChild(li);
-    console.log("Aufnahme exportiert.");
-}
 
 /* SPÄTER: erneutes Anhören */
 function createAudioObject(blob) {
@@ -298,11 +291,25 @@ function sendData(data) {
     ).then(function (data) {
         data.text().then(text => {
             if (text != "Audio empfangen") {
-                //aufnehmenErrorMessage.style.opacity = 1;
-                //aufnehmenErrorMessage.innerHTML = text;
+                displayAufnahmeFehler(text);
+
             }
         })
     })
+}
+
+function displayAufnahmeFehler(fehler){
+    aufnehmenErrorMessage.css("opacity", "1");
+    aufnehmenErrorMessage.html(fehler);
+}
+
+function hideAufnahmeFehler(){
+    if (aufnehmenErrorMessage.html()) {
+        aufnehmenErrorMessage.css("opacity", "0");
+        aufnehmenErrorMessage.html("");
+        
+
+    }
 }
 
 

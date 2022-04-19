@@ -45,3 +45,8 @@ def show_bin_icon(text_length):
 
 def save_raw_targetsatz(HTTP_TARGETSATZ):
     return re.sub("\s\s+", " ", str(unquote(str(HTTP_TARGETSATZ)))).strip()
+
+
+def clean_targetsatz(HTTP_TARGETSATZ):
+    raw_targetsatz =  re.sub("\s\s+", " ", str(unquote(str(HTTP_TARGETSATZ)))).strip().lower()
+    return re.sub('[^a-zäüöß ]+', '', raw_targetsatz)

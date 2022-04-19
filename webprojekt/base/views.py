@@ -8,7 +8,7 @@ import django.middleware.csrf as dcsrf
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-from utils.textCheck import check_text, sonderzeichen_entfernen, save_raw_targetsatz
+from utils.textCheck import check_text, sonderzeichen_entfernen, save_raw_targetsatz, clean_targetsatz
 from utils.audio import generate_time_stamp
 
 
@@ -84,7 +84,21 @@ def audio(request):
     
     timestamp = generate_time_stamp()
     request.session["rawtargetsatz_%s" % session_id] = save_raw_targetsatz(request.META["HTTP_TARGETSATZ"])
-    print(request.session["rawtargetsatz_%s" % session_id])
+    if not request.session["rawtargetsatz_%s" % session_id]:
+        return HttpResponse("Bitte gib einen Übungssatz ein.")
+
+    elif check_text(request.session["rawtargetsatz_%s" % session_id])[0]:
+        return HttpResponse("Bitte überprüfe den Übungssatz.")
+
+    request.session["cleantargetsatz_%s" % session_id] = clean_targetsatz(request.META["HTTP_TARGETSATZ"])
+    request.session["audiopath_%s" % session_id] = f'./media/{timestamp}_{session_id}.wav'
+
+    with open(request.session["audiopath_%s" % session_id], "wb") as audiofile:
+        audiofile.write(request.body)
+        
+
+    # TODO: AUDIO AUFNEHMEN UND AN GOOGLE, AT & IBM GEBEN
+    # siehe: https://dakopen.kanbantool.com/b/785103#?
 
     return HttpResponse("Audio empfangen")
 
