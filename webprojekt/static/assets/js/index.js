@@ -4,10 +4,13 @@ const textareaError = $("#textarea-error");
 const binIcon = $("#bin-icon");
 const mikrofonIcon = $("#mikrofon-icon");
 const aufnehmenErrorMessage = $("#aufnehmen-fehlermeldung");
+const rightButton = $("#right-button");
 var sessionId = null;
 var remainingInterval = null;
 var secondsPassed = 0;
 
+
+const waveform = document.getElementById("waveform");
 var textareaMaxWidth = null;
 var textareaWidth = null;
 
@@ -228,6 +231,14 @@ function startRecording() {
 
         gumStream = stream;
         /* use the stream */
+        
+        let wave = new Wave();
+        maximize_waveform();
+        wave.fromStream(stream, "waveform", {
+            type: "flower blocks",
+            colors: ["#5c50fe", "#aa6bfd"]
+        });
+
 
         input = audioContext.createMediaStreamSource(stream);
         /* Create the Recorder object and configure to record mono sound (1 channel) Recording 2 channels will double the file size */
@@ -237,15 +248,16 @@ function startRecording() {
         //start the recording process 
         rec.record()
         console.log("Aufnahme gestartet...");
+
+        rightButton.html("abbrechen");
+        rightButton.click(abortRecording);
+        toggleRightButton();
+
         remainingInterval = setInterval(secondsRemaining, 1000);
         aufnahmeTimeout = setTimeout(function () {
             console.log("Aufnahme-Timeout");
             stopRecording();
         }, 23000);
-
-
-
-
 
     }).catch(function (err) {
         //enable the record button if getUserMedia() fails 
@@ -253,21 +265,41 @@ function startRecording() {
     });
 }
 
+function endRecordingState(){
+    clearTimeout(aufnahmeTimeout);
+    secondsPassed = 0;
+    clearInterval(remainingInterval);
+    hideAufnahmeFehler();
+    toggleRightButton();
+
+    mikrofonIcon.attr("src", "static/assets/images/Mikrofon.svg");
+    mikrofonIcon.css({ "width": "62%", "height": "62%" });
+    rec.stop(); //stop microphone access
+    gumStream.getAudioTracks()[0].stop();
+}
+
+function abortRecording() {
+    if (rec.recording) {
+        endRecordingState();
+        console.log("Aufnahme abgebrochen.");
+    }
+}
+
 function stopRecording() {
     //tell the recorder to stop the recording
     if (rec.recording) {
-        clearTimeout(aufnahmeTimeout);
-        secondsPassed = 0;
-        clearInterval(remainingInterval);
-        mikrofonIcon.attr("src", "static/assets/images/Mikrofon.svg");
-        mikrofonIcon.css({ "width": "62%", "height": "62%" });
-
-        rec.stop(); //stop microphone access
-        gumStream.getAudioTracks()[0].stop();
+        endRecordingState();
         rec.exportWAV(sendData);
         console.log("Aufnahme beendet.");
     }
 }
+
+
+function toggleRightButton(){
+    rightButton.toggleClass("active");
+    rightButton.toggleClass("inactive");
+}
+
 
 
 /* SPÄTER: erneutes Anhören */
@@ -281,7 +313,7 @@ function createAudioObject(blob) {
 
 function sendData(data) {
     createAudioObject(data);
-    console.log("Sendet Audio Dateien ans Backend");
+    console.log("Senden der Audio Dateien ans Backend...");
     parameterUrl = `/audio/?session=${sessionId}`;
     fetch(parameterUrl,
         {
@@ -304,15 +336,14 @@ function sendData(data) {
 
 function secondsRemaining(audiolaenge){
     secondsPassed++;
-    
+    displayAufnahmeFehler("Zum Beenden erneut drücken...")
     audiolaenge = 21 - secondsPassed;
     if (audiolaenge < 10 && audiolaenge > 1){
-        displayAufnahmeFehler(`Noch ${audiolaenge} Sekunden`);
+        displayAufnahmeFehler(`Zum Beenden erneut drücken... Noch ${audiolaenge} Sekunden`);
     }
     else if (audiolaenge == 1){
-        displayAufnahmeFehler(`Noch ${audiolaenge} Sekunde`);
+        displayAufnahmeFehler(`Zum Beenden erneut drücken... Noch ${audiolaenge} Sekunde`);
     }
-    else hideAufnahmeFehler();
 
 }
 
@@ -329,6 +360,15 @@ function hideAufnahmeFehler(){
 
     }
 }
+
+function minimize_waveform() {
+    waveform.style.width = "50%";
+}
+
+function maximize_waveform() {
+    waveform.style.width = "330%";
+}
+
 
 
 

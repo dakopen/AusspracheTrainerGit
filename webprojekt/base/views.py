@@ -80,7 +80,6 @@ def satzgenerator(request):
 def audio(request):
     session_id = get_session_id(request)
 
-    print(sys.getsizeof(request.body), "SIZE OF FILE")
     if sys.getsizeof(request.body) < 1000:
         return HttpResponse("Die Audioaufnahme ist zu kurz. Bitte erneut aufnehmen.")
     

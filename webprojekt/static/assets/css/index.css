@@ -191,7 +191,7 @@ img#mikrofon-icon {
 
 /* ABBRECHEN-WIEDERHOLEN btn */
 
-.right-button {
+#right-button {
     position: absolute;
     margin: auto;
     transform: translate(-50%, -50%);
@@ -199,7 +199,18 @@ img#mikrofon-icon {
     top: 55%;
     border-radius: 30px;
     font-size: max(min(3vw, 30px), 18px);
+    outline: none;
+    transition: .75s;
+}
+
+#right-button.inactive {
     opacity: 0;
+    visibility: hidden;
+}
+
+#right-button.active {
+    opacity: 1;
+    visibility: unset;
 }
 
 
