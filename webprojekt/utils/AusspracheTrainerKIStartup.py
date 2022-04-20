@@ -5,7 +5,7 @@ import re
 import torch.nn as nn
 import torch.nn.functional as F
 import torchaudio
-
+import time
 
 path_to_model = r"C:\Users\dakop\OneDrive\AusspracheTrainerKI.pt"
 text_transform = TextTransform()
@@ -58,6 +58,8 @@ class AusspracheTrainerKI:
         print("[1/2] Model hat geladen")
         self.model = model
         self.device = device
+
+        self.creationdate = time.time()
 
     @staticmethod
     def data_processing(data):

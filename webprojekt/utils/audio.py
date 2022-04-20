@@ -1,6 +1,7 @@
 from datetime import datetime
 import pathlib
 import logging
+import time
 from utils.IPA import IPA
 import speech_recognition as sr
 from utils.IBM_API import send_to_IBM
@@ -53,9 +54,12 @@ class Audioverarbeitung:
             return "#*# ERROR RECEIVED GOOGLE", ""
     
     def AT(self):
+        global aussprachetrainer
+        if time.time() - aussprachetrainer.creationdate > 84000:  # wird jeden Tag neu gestartet
+            del aussprachetrainer
+            aussprachetrainer = AusspracheTrainerKI()
         try:
             AusspracheTrainerIPAKI = aussprachetrainer.aussprachetrainer_predict(self.audiopath)
-            print(AusspracheTrainerIPAKI, "KIIII")
             AusspracheTrainerIPAKI = [item for sublist in AusspracheTrainerIPAKI for item in sublist]
             return " ".join(AusspracheTrainerIPAKI)
         except:
