@@ -4,6 +4,10 @@ import logging
 from utils.IPA import IPA
 import speech_recognition as sr
 from utils.IBM_API import send_to_IBM
+
+from utils.AusspracheTrainerKIStartup import AusspracheTrainerKI
+aussprachetrainer = AusspracheTrainerKI()
+
 r = sr.Recognizer()
 
 
@@ -49,7 +53,13 @@ class Audioverarbeitung:
             return "#*# ERROR RECEIVED GOOGLE", ""
     
     def AT(self):
-        print("AT")
+        try:
+            AusspracheTrainerIPAKI = aussprachetrainer.aussprachetrainer_predict(self.audiopath)
+            print(AusspracheTrainerIPAKI, "KIIII")
+            AusspracheTrainerIPAKI = [item for sublist in AusspracheTrainerIPAKI for item in sublist]
+            return " ".join(AusspracheTrainerIPAKI)
+        except:
+            return "#*# ERROR RECEIVED AUSSPRACHETRAINERKI"
 
     def delete_audio(self):
         audio_file = pathlib.Path(self.audiopath)

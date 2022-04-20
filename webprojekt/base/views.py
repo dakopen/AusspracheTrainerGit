@@ -121,6 +121,7 @@ def result(request):
         print(target_ipa.result())
         print(future_google.result())
         print(future_ibm.result())
+        print(future_at.result())
         audioverarbeiter.delete_audio()
 
 
