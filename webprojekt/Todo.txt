@@ -1,0 +1,5 @@
+TODO:
+    - Transkripte von Google / IBM / AT einsehen (über Button, wenn markiert ist aktiviert, erneut drücke zum deaktivieren)
+    - HTML von den anderen Seiten einfügen
+    - Sponsor Browserstack hinzufügen
+    - Datenbank-Anbindung

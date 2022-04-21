@@ -122,11 +122,6 @@ def result(request):
         executor.shutdown()
         audioverarbeiter.delete_audio()
 
-    print(future_target_ipa.result())
-    print(future_google.result())
-    print(future_ibm.result())
-    print(future_at.result())
-
     request.session["target_ipa_%s" % session_id] = future_target_ipa.result()[0]
     request.session["target_ipa_zuordnungen_%s" % session_id] = future_target_ipa.result()[1]
     request.session["google_ki_ipa_%s" % session_id] = future_google.result()[0]
@@ -150,11 +145,6 @@ def result(request):
 
     reg = re.compile('^[a-zA-ZäöüÄÖÜß\s]')
     
-    print(auswertungsergebnis, "AUSWERTUNGSERGEBNIS")
-    print(scores, "SCORES")
-
-    print(str(request.session["rawtargetsatz_%s" % session_id]), "RAWTARGETSATZ")
-
     for index, buchstabe in enumerate(str(request.session["rawtargetsatz_%s" % session_id])):
         try:
             if buchstabe.isalnum() and reg.match(buchstabe):

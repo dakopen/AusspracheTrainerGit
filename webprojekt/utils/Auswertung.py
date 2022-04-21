@@ -27,9 +27,6 @@ def auswertung(target_ipa, ipa_zuordnungen, predictions):
     Grün (perfekt), Lila (leicht unverständlich), Gelb (unverständlich), Rot (sehr unverständlich)
     Außerdem wird die Aussprache auf Sprachfehler (zurzeit nur Sigmatimus (Lispeln)) überprüft.
     """
-    print("###"*6)
-    print(target_ipa, ipa_zuordnungen, predictions)
-
 
     predictions[2] = "".join([i for i in predictions[2] if i not in ["ˈ", "ˌ"]])
     scores_and_sequences1, matchings = einzelvergleich(target_ipa, predictions[0])
