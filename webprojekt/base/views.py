@@ -3,12 +3,15 @@ import sys
 import secrets
 import random
 import concurrent.futures
+from django.template.loader import render_to_string
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from utils.textCheck import check_text, sonderzeichen_entfernen, save_raw_targetsatz, clean_targetsatz
 from utils.audio import generate_time_stamp, Audioverarbeitung
 from time import sleep
+from utils.Auswertung import auswertung, sprachfehler_from_scores, adjektiv_fuer_score, calculate_colour
+import re
 import logging
 
 logging.basicConfig(filename='test.log', encoding='utf-8-sig', level=logging.DEBUG)
@@ -115,20 +118,72 @@ def result(request):
         future_ibm = executor.submit(audioverarbeiter.IBM)
         future_at = executor.submit(audioverarbeiter.AT)
 
-        target_ipa = executor.submit(audioverarbeiter.ipa.text_zu_IPA, audioverarbeiter.ipa.text_preparation(str(request.session["cleantargetsatz_%s" % session_id])))
-        print(target_ipa)
+        future_target_ipa = executor.submit(audioverarbeiter.ipa.text_zu_IPA, audioverarbeiter.ipa.text_preparation(str(request.session["cleantargetsatz_%s" % session_id])))
+        print(future_target_ipa)
         executor.shutdown()
-        print(target_ipa.result())
-        print(future_google.result())
-        print(future_ibm.result())
-        print(future_at.result())
         audioverarbeiter.delete_audio()
 
+    print(future_target_ipa.result())
+    print(future_google.result())
+    print(future_ibm.result())
+    print(future_at.result())
+
+    request.session["target_ipa_%s" % session_id] = future_target_ipa.result()[0]
+    request.session["target_ipa_zuordnungen_%s" % session_id] = future_target_ipa.result()[1]
+    request.session["google_ki_%s" % session_id] = future_google.result()[1]
+    request.session["at_ki_%s" % session_id] = future_at.result()
+    request.session["ibm_ki_%s" % session_id] = future_ibm.result()[1]
+    
+    
+
+    if any(future for future in [future_google.result()[0], future_ibm.result()[0], future_at.result()] if future.startswith("#*# ERROR RECEIVED")):
+        return HttpResponse("<span class='red' style='font-size:1em;'>Error erhalten: Der aufgenommene Satz konnte nicht analysiert werden. Bitte erneut aufnehmen oder einen anderen Satz versuchen.</span>")
+    
+    
+    
+
+    auswertungsergebnis, scores, sprachfehler_scores = auswertung(request.session["target_ipa_%s" % session_id], request.session["target_ipa_zuordnungen_%s" % session_id], 
+                                                                [request.session["at_ki_%s" % session_id],
+                                                                request.session["google_ki_%s" % session_id],
+                                                                request.session["ibm_ki_%s" % session_id]])
+    buchstabenscores = {}
+    buchstabenindex = 0
+
+    reg = re.compile('^[a-zA-ZäöüÄÖÜß\s]')
+    for index, buchstabe in enumerate(str(request.session["rawtargetsatz_%s" % session_id])):
+        colour = "green"
+        try:
+            if buchstabe.isalnum() and reg.match(buchstabe):
+                colour = calculate_colour(auswertungsergebnis[buchstabenindex])
+                buchstabenindex += 1
+            elif buchstabe == " " and str(request.session["targetsatz_%s" % session_id])[buchstabenindex] == " ":
+                colour = calculate_colour(auswertungsergebnis[buchstabenindex])
+                buchstabenindex += 1
+        except IndexError:
+            print("Indexerror, aber nicht schlimm")
+        buchstabenscores[index] = (colour, buchstabe)
+    request.session["buchstabenscores_%s" % session_id] = buchstabenscores
+    farbigeAntwort = buchstaben_scores_interally(request)
+    if scores[0] < 0:
+        scores = (0, scores[1], scores[2])
+
+    context = {
+        "farbigeAntwort": farbigeAntwort,
+        "finalscore": ("%.2f" % float(scores[0] * 100)).replace(".", ","),
+        "scoreadjektiv": adjektiv_fuer_score(scores[0]),
+        "sprachfehler": sprachfehler_from_scores(sprachfehler_scores, scores[1]),
+    }
+
+    # TODO: In eine Datenbank schreiben
+
+    return render(request, '../templates/ergebnis.html', context=context)
 
 
 
-
-    return HttpResponse("<span><em>HTML</em> result</span>")
+def buchstaben_scores_interally(request):
+    session_id = str(request.GET.get('session'))
+    context = {"buchstabenscores": request.session["buchstabenscores_%s" % session_id]}
+    return render_to_string('../templates/farbigeAntwort.html', context=context)
 
 
 def handler404(request, exception):
