@@ -31,7 +31,7 @@ class Audioverarbeitung:
                 
             IBM_KI = send_to_IBM(self.audiopath)
             if IBM_KI != "#*# ERROR RECEIVED IBM":
-                IBM_IPAKI, _ = self.ipa.text_zu_IPA(self.ipa.text_preparation(" ".join(IBM_KI)))
+                IBM_IPAKI, _ = self.ipa.text_zu_IPA(self.ipa.text_preparation(" ".join(IBM_KI).lower()))
             else:
                 IBM_IPAKI = IBM_KI
 

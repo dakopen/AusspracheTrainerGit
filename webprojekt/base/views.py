@@ -119,7 +119,6 @@ def result(request):
         future_at = executor.submit(audioverarbeiter.AT)
 
         future_target_ipa = executor.submit(audioverarbeiter.ipa.text_zu_IPA, audioverarbeiter.ipa.text_preparation(str(request.session["cleantargetsatz_%s" % session_id])))
-        print(future_target_ipa)
         executor.shutdown()
         audioverarbeiter.delete_audio()
 
@@ -130,9 +129,9 @@ def result(request):
 
     request.session["target_ipa_%s" % session_id] = future_target_ipa.result()[0]
     request.session["target_ipa_zuordnungen_%s" % session_id] = future_target_ipa.result()[1]
-    request.session["google_ki_%s" % session_id] = future_google.result()[1]
+    request.session["google_ki_ipa_%s" % session_id] = future_google.result()[0]
     request.session["at_ki_%s" % session_id] = future_at.result()
-    request.session["ibm_ki_%s" % session_id] = future_ibm.result()[1]
+    request.session["ibm_ki_ipa_%s" % session_id] = future_ibm.result()[0]
     
     
 
@@ -144,21 +143,28 @@ def result(request):
 
     auswertungsergebnis, scores, sprachfehler_scores = auswertung(request.session["target_ipa_%s" % session_id], request.session["target_ipa_zuordnungen_%s" % session_id], 
                                                                 [request.session["at_ki_%s" % session_id],
-                                                                request.session["google_ki_%s" % session_id],
-                                                                request.session["ibm_ki_%s" % session_id]])
+                                                                request.session["google_ki_ipa_%s" % session_id],
+                                                                request.session["ibm_ki_ipa_%s" % session_id]])
     buchstabenscores = {}
     buchstabenindex = 0
 
     reg = re.compile('^[a-zA-ZäöüÄÖÜß\s]')
+    
+    print(auswertungsergebnis, "AUSWERTUNGSERGEBNIS")
+    print(scores, "SCORES")
+
+    print(str(request.session["rawtargetsatz_%s" % session_id]), "RAWTARGETSATZ")
+
     for index, buchstabe in enumerate(str(request.session["rawtargetsatz_%s" % session_id])):
-        colour = "green"
         try:
             if buchstabe.isalnum() and reg.match(buchstabe):
                 colour = calculate_colour(auswertungsergebnis[buchstabenindex])
                 buchstabenindex += 1
-            elif buchstabe == " " and str(request.session["targetsatz_%s" % session_id])[buchstabenindex] == " ":
+            elif buchstabe == " " and str(request.session["cleantargetsatz_%s" % session_id])[buchstabenindex] == " ":
                 colour = calculate_colour(auswertungsergebnis[buchstabenindex])
                 buchstabenindex += 1
+            else:
+                colour = "green"
         except IndexError:
             print("Indexerror, aber nicht schlimm")
         buchstabenscores[index] = (colour, buchstabe)

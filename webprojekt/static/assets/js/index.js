@@ -356,6 +356,7 @@ function sendData(data) {
                 receiveResponse();
                 console.log("receiveResponse startet");
                 loadingSymbol.removeClass("inactive");
+                responseText.width("50%");
                 responseText.html("Audio an AusspracheTrainerIPAKI, Google und IBM senden...");
             }
         })
@@ -376,6 +377,7 @@ function receiveResponse() {
         data.text().then(text => {
             console.log(text);
             responseText.html(text);
+            responseText.width("100%");
             loadingSymbol.addClass("inactive");
 
         })
