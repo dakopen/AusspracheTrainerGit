@@ -246,6 +246,8 @@ img#mikrofon-icon {
     left: 160%;
     top: 55%;
     border-radius: 30px;
+    width:fit-content;
+    white-space: nowrap;
     font-size: max(min(3vw, 30px), 18px);
     outline: none;
     transition: .75s;

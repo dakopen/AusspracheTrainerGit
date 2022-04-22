@@ -9,7 +9,9 @@ const rightButton = $("#right-button");
 const leftButton = $("#left-button");
 const responseText = $("#responseText");
 const loadingSymbol = $("#loading-symbol");
+const generierenButton = $("#generieren");
 var sessionId = null;
+var aufnehmen_verbieten = false;
 var audioObjectListenAgain = null;
 var remainingInterval = null;
 var secondsPassed = 0;
@@ -184,15 +186,11 @@ function checkTextareaInputServerside() {
                 else {
                     binIcon.removeClass("active");
                     binIcon.addClass("inactive");
-                };
+                }
+                aufnehmen_verbieten = data[2]
             }
             );
     }
-}
-
-function clearTextarea() {
-    textarea.val("");
-    resizeTextarea();
 }
 
 /* AUDIO */
@@ -225,7 +223,7 @@ function finalTextareaCheckBeforeRecording(){
     if (!textarea.val()) {
         displayAufnahmeFehler("Bitte erst einen Übungssatz eingeben.");
     }
-    else if (textareaError.html()){
+    else if (aufnehmen_verbieten){
         displayAufnahmeFehler("Bitte überprüfe den Übungssatz.");
     }
     else startRecording();
@@ -234,7 +232,9 @@ function finalTextareaCheckBeforeRecording(){
 function startRecording() {
     navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function (stream) {
         console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
-
+        textarea.attr("readonly", true); 
+        binIcon.prop("disabled", true);
+        generierenButton.prop("disabled", true);
         hideResponsearea();
         /* Aktives Mikrofon Bild */
         mikrofonIcon.attr("src", "/static/assets/images/Mikrofon_aktiv.svg");
@@ -282,6 +282,9 @@ function startRecording() {
 }
 
 function endRecordingState(){
+    textarea.attr("readonly", false);
+    binIcon.prop("disabled", false);
+    generierenButton.prop("disabled", false);
     clearTimeout(aufnahmeTimeout);
     secondsPassed = 0;
     clearInterval(remainingInterval);
@@ -316,6 +319,8 @@ function hideResponsearea() {
     responsearea.css("transition", "0.3s");
     responsearea.removeClass("active");
     responsearea.addClass("inactive");
+    leftButton.removeClass("active");
+    rightButton.removeClass("active");
 
 }
 
@@ -380,6 +385,8 @@ function receiveResponse() {
     ).then(function (data) {
         responseText.html("Aussprache wird analysiert...");
         data.text().then(text => {
+            
+            if (responsearea.hasClass("active")){
             responseText.html(text);
             responseText.width("100%");
             loadingSymbol.addClass("inactive");
@@ -393,8 +400,8 @@ function receiveResponse() {
 
             rightButton.html("neuer Satz");
             rightButton.unbind();
-            rightButton.click(neuerSatz);
-            rightButton.addClass("active");
+            rightButton.click(clearTextarea);
+            rightButton.addClass("active");}
 
         })
     })
@@ -477,11 +484,9 @@ function showTranscript(event){
 
 }
 
-function neuerSatz() {
+function clearTextarea() {
     textarea.val("");
     resizeTextarea();
     textarea.select();
     hideResponsearea();
-    leftButton.removeClass("active");
-    rightButton.removeClass("active");
 }

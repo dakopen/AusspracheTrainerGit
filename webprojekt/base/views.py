@@ -51,8 +51,8 @@ def textinput_check(request):
         return redirect("/")
 
     text = (request.body).decode("utf-8-sig")
-    fehler_liste, bin_icon_bool = check_text(text)
-    return JsonResponse([fehler_liste, bin_icon_bool], safe=False)
+    fehler_liste, bin_icon_bool, aufnehmen_verbieten = check_text(text)
+    return JsonResponse([fehler_liste, bin_icon_bool, aufnehmen_verbieten], safe=False)
 
 @csrf_exempt
 def satzgenerator(request):
@@ -95,7 +95,8 @@ def audio(request):
         logging.debug(f"Not request.session[rawtargetsatz]: {request.session['rawtargetsatz_%s' % session_id]}  | {session_id}")
         return HttpResponse("Bitte gib einen Übungssatz ein.")
 
-    elif check_text(request.session["rawtargetsatz_%s" % session_id])[0]:
+    elif check_text(request.session["rawtargetsatz_%s" % session_id])[2]:
+        print(f"Check_Text Fehler in request.session[rawtargetsatz]: {request.session['rawtargetsatz_%s' % session_id]}  | {session_id}")
         logging.debug(f"Check_Text Fehler in request.session[rawtargetsatz]: {request.session['rawtargetsatz_%s' % session_id]}  | {session_id}")
         return HttpResponse("Bitte überprüfe den Übungssatz.")
 

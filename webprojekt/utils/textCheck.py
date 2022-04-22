@@ -6,6 +6,7 @@ def sonderzeichen_entfernen(text):
 
 
 def check_text(text):
+    aufnehmen_verbieten = False
     fehler_liste = []
     if len(text) > 120:
         raise Exception("Text ist zu lange")
@@ -15,15 +16,19 @@ def check_text(text):
 
     if bool(re.search("[^a-zA-ZäöüÄÖÜß0-9 \s\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]", text)):
         fehler_liste.append("Bitte nur deutsches Alphabet verwenden.")
+        aufnehmen_verbieten = True
 
     if bool(re.search(r'\d', text)):
         fehler_liste.append("Bitte Zahlen ausschreiben.")
+        aufnehmen_verbieten = True
 
     if bool(re.search("[#%&$€\x23-\x26]", text)):
         fehler_liste.append("Bitte Sonderzeichen ausschreiben.")
+        aufnehmen_verbieten = True
     
     if any(wort for wort in text.split() if len(wort) > 25):
         fehler_liste.append("Kein Wort darf länger als 25 Buchstaben lang sein.")
+        aufnehmen_verbieten = True
     
     if 119 > len(raw_text) > 100:
         fehler_liste.append(f"Noch {120-len(raw_text)} Buchstaben verbleiben...")
@@ -34,7 +39,7 @@ def check_text(text):
     
     bin_icon_bool = show_bin_icon(len(raw_text))
 
-    return fehler_liste, bin_icon_bool
+    return fehler_liste, bin_icon_bool, aufnehmen_verbieten
 
 
 def show_bin_icon(text_length):
