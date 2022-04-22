@@ -1,5 +1,9 @@
 TODO:
-    - Transkripte von Google / IBM / AT einsehen (über Button, wenn markiert ist aktiviert, erneut drücke zum deaktivieren)
+    - Wiederholen Button
+    - andere Buttons deaktivieren, wenn Anzeige kommt
     - HTML von den anderen Seiten einfügen
     - Sponsor Browserstack hinzufügen
     - Datenbank-Anbindung
+
+DONE:
+    - Transkripte von Google / IBM / AT einsehen (über Button, wenn markiert ist aktiviert, erneut drücke zum deaktivieren)

@@ -6,6 +6,7 @@ const binIcon = $("#bin-icon");
 const mikrofonIcon = $("#mikrofon-icon");
 const aufnehmenErrorMessage = $("#aufnehmen-fehlermeldung");
 const rightButton = $("#right-button");
+const leftButton = $("#left-button");
 const responseText = $("#responseText");
 const loadingSymbol = $("#loading-symbol");
 var sessionId = null;
@@ -233,6 +234,7 @@ function startRecording() {
     navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function (stream) {
         console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
 
+        hideResponsearea();
         /* Aktives Mikrofon Bild */
         mikrofonIcon.attr("src", "/static/assets/images/Mikrofon_aktiv.svg");
         mikrofonIcon.css({ "width": "80%", "height": "80%" });
@@ -258,10 +260,12 @@ function startRecording() {
         //start the recording process 
         rec.record()
         console.log("Aufnahme gestartet...");
-
+        
+        leftButton.removeClass("active");
         rightButton.html("abbrechen");
+        rightButton.unbind();
         rightButton.click(abortRecording);
-        toggleRightButton();
+        rightButton.addClass("active");
 
         remainingInterval = setInterval(secondsRemaining, 1000);
         aufnahmeTimeout = setTimeout(function () {
@@ -281,7 +285,8 @@ function endRecordingState(){
     secondsPassed = 0;
     clearInterval(remainingInterval);
     hideAufnahmeFehler();
-    toggleRightButton();
+    
+    rightButton.removeClass("active");
 
     mikrofonIcon.attr("src", "static/assets/images/Mikrofon.svg");
     mikrofonIcon.css({ "width": "62%", "height": "62%" });
@@ -306,16 +311,15 @@ function stopRecording() {
 }
 
 
-function toggleRightButton(){
-    rightButton.toggleClass("active");
-}
-
 function hideResponsearea() {
+    responsearea.css("transition", "0.3s");
     responsearea.removeClass("active");
     responsearea.addClass("inactive");
+
 }
 
 function displayResponsearea() {
+    responsearea.css("transition", "1.5s");
     responsearea.removeClass("inactive");
     responsearea.addClass("active");
 
@@ -378,6 +382,15 @@ function receiveResponse() {
             responseText.html(text);
             responseText.width("100%");
             loadingSymbol.addClass("inactive");
+            leftButton.addClass("active");
+            leftButton.html("wiederholen");
+            leftButton.unbind();
+            leftButton.click(startRecording);
+
+            rightButton.html("neuer Satz");
+            rightButton.unbind();
+            rightButton.click(neuerSatz);
+            rightButton.addClass("active");
 
         })
     })
@@ -458,4 +471,13 @@ function showTranscript(event){
         receiveOtherTranscripts("original");        
     }
 
+}
+
+function neuerSatz() {
+    textarea.val("");
+    resizeTextarea();
+    textarea.select();
+    hideResponsearea();
+    leftButton.removeClass("active");
+    rightButton.removeClass("active");
 }

@@ -216,17 +216,24 @@ img#mikrofon-icon {
 
 /* WEITERUEBEN btn */
 
-.left-button {
+#left-button {
     position: absolute;
     margin: auto;
     transform: translate(-50%, -50%);
-    left: -60%;
+    left: -80%;
     top: 55%;
     border-radius: 30px;
     font-size: max(min(3vw, 30px), 18px);
     white-space: nowrap;
     opacity: 0;
     z-index: 1;
+    visibility: hidden;
+
+}
+
+#left-button.active {
+    opacity: 1 !important;
+    visibility: unset !important;
 }
 
 
