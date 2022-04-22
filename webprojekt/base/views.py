@@ -125,9 +125,11 @@ def result(request):
     request.session["target_ipa_%s" % session_id] = future_target_ipa.result()[0]
     request.session["target_ipa_zuordnungen_%s" % session_id] = future_target_ipa.result()[1]
     request.session["google_ki_ipa_%s" % session_id] = future_google.result()[0]
+    request.session["google_ki_%s" % session_id] = future_google.result()[1]
     request.session["at_ki_%s" % session_id] = future_at.result()
     request.session["ibm_ki_ipa_%s" % session_id] = future_ibm.result()[0]
-    
+    request.session["ibm_ki_%s" % session_id] = future_ibm.result()[1]
+
     
 
     if any(future for future in [future_google.result()[0], future_ibm.result()[0], future_at.result()] if future.startswith("#*# ERROR RECEIVED")):
@@ -170,6 +172,7 @@ def result(request):
         "sprachfehler": sprachfehler_from_scores(sprachfehler_scores, scores[1]),
     }
 
+    request.session["farbigeantwort_%s" % session_id] = farbigeAntwort
     # TODO: In eine Datenbank schreiben
 
     return render(request, '../templates/ergebnis.html', context=context)
@@ -177,9 +180,30 @@ def result(request):
 
 
 def buchstaben_scores_interally(request):
-    session_id = str(request.GET.get('session'))
+    session_id = get_session_id(request)
     context = {"buchstabenscores": request.session["buchstabenscores_%s" % session_id]}
     return render_to_string('../templates/farbigeAntwort.html', context=context)
+
+def get_other_transcripts(request):
+    session_id = get_session_id(request)
+    transcript = (request.body).decode("utf-8-sig")  # [at / google / ibm]
+    
+    if transcript == "at":
+        return JsonResponse([request.session["target_ipa_%s" % session_id], "<p class='lila farbigeAntwort'>" + request.session["at_ki_%s" % session_id] + "</p>"], safe=False)
+    
+    elif transcript == "original":
+        return JsonResponse([request.session["rawtargetsatz_%s" % session_id], request.session["farbigeantwort_%s" % session_id]], safe=False)
+
+    elif transcript == "google":
+        return JsonResponse([request.session["rawtargetsatz_%s" % session_id], "<p class='lila farbigeAntwort'>" + request.session["google_ki_%s" % session_id] + "</p>"], safe=False)
+    
+    elif transcript == "ibm":  # = else
+        return JsonResponse([request.session["rawtargetsatz_%s" % session_id], "<p class='lila farbigeAntwort'>" + request.session["ibm_ki_%s" % session_id] + "</p>"], safe=False)
+
+
+
+
+
 
 
 def handler404(request, exception):

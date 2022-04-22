@@ -24,7 +24,7 @@ urlpatterns = [
     path("satzcheck/", views.textinput_check),
     path("audio/", views.audio),
     path("result/", views.result),
-
+    path("transcripts/", views.get_other_transcripts),
 
     path("privacy-policy/", views.privacypolicy, name="privacy_policy"),
     path("sources/", views.sources, name="sources"),

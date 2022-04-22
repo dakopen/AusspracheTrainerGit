@@ -375,7 +375,6 @@ function receiveResponse() {
     ).then(function (data) {
         responseText.html("Aussprache wird analysiert...");
         data.text().then(text => {
-            console.log(text);
             responseText.html(text);
             responseText.width("100%");
             loadingSymbol.addClass("inactive");
@@ -414,4 +413,49 @@ function minimize_waveform() {
 
 function maximize_waveform() {
     waveform.style.width = "330%";
+}
+
+function getChildren(n, skipMe){
+    var r = [];
+    for ( ; n; n = n.nextSibling ) 
+       if ( n.nodeType == 1 && n != skipMe)
+          r.push( n );        
+    return r;
+};
+
+function getSiblings(n) {
+    return getChildren(n.parentNode.firstChild, n);
+}
+
+
+function receiveOtherTranscripts(transcript) {
+    parameterUrl = `/transcripts/?session=${sessionId}`;
+    fetch(parameterUrl,
+        {
+            method: "post",
+            body: transcript,
+            headers: {
+                "X-CSRFToken": getCookie('csrftoken'),
+            },
+        }
+    ).then(function (data) {
+        data.text().then(text => {
+            text = JSON.parse(text);            
+            textarea.val(text[0]);
+            $('.farbigeAntwort-container').html(text[1]);
+        })
+    })
+}
+
+function showTranscript(event){
+    event.target.classList.toggle("active");
+    getSiblings(event.target).forEach(sibling => sibling.classList.remove("active"));
+    
+    if (event.target.classList.contains("active")) {
+        receiveOtherTranscripts(event.target.value);        
+    }
+    else {
+        receiveOtherTranscripts("original");        
+    }
+
 }

@@ -340,8 +340,16 @@ img#mikrofon-icon {
 
 /* TODO: EINORDNEN */
 
+.transcript-btn {
+    margin-left:3%;
+    margin-right:3%;
+    width:25%;
+    font-size: min(24px, 4vw);
+}
 
-
+.transcript-btn.active {
+    background-color: var(--rosa);
+}
 
 
 

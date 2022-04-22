@@ -39,15 +39,14 @@
     
     
         <div style="text-align:center;margin-top: 1em;">
-            <button class="btnAusspracheTrainerKI" style="margin-left:3%;margin-right:3%;width:25%;font-size: min(24px, 4vw);"
-                    onpointerup="KITYP_onpointerup()"
-                    onpointerdown="get_AT_transcript()">AT
+            <button class="transcript-btn" value="at"
+                    onclick="showTranscript(event)">AT
             </button>
-            <button style="margin-left:3%;margin-right:3%;width:25%;font-size: min(24px, 4vw);"
-                    onpointerup="KITYP_onpointerup()" onpointerdown="get_GOOGLE_transcript()">Google
+            <button class="transcript-btn" value="google" onclick="showTranscript(event)"
+                    >Google
             </button>
-            <button style="margin-left:3%;margin-right:3%;width:25%;font-size: min(24px, 4vw);"
-                    onpointerup="KITYP_onpointerup()" onpointerdown="get_IBM_transcript()">IBM
+            <button class="transcript-btn" value="ibm" onclick="showTranscript(event)"
+                    >IBM
             </button>
         </div>
     </div>
