@@ -10,6 +10,7 @@ const leftButton = $("#left-button");
 const responseText = $("#responseText");
 const loadingSymbol = $("#loading-symbol");
 var sessionId = null;
+var audioObjectListenAgain = null;
 var remainingInterval = null;
 var secondsPassed = 0;
 
@@ -382,6 +383,9 @@ function receiveResponse() {
             responseText.html(text);
             responseText.width("100%");
             loadingSymbol.addClass("inactive");
+
+            document.getElementById("responseText").insertBefore(audioObjectListenAgain, document.getElementById("responseText").children[1]);
+
             leftButton.addClass("active");
             leftButton.html("wiederholen");
             leftButton.unbind();

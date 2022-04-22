@@ -1,5 +1,5 @@
 TODO:
-    - Wiederholen Button
+    - Satz wiederanhören
     - andere Buttons deaktivieren, wenn Anzeige kommt
     - HTML von den anderen Seiten einfügen
     - Sponsor Browserstack hinzufügen
@@ -7,3 +7,4 @@ TODO:
 
 DONE:
     - Transkripte von Google / IBM / AT einsehen (über Button, wenn markiert ist aktiviert, erneut drücke zum deaktivieren)
+    - Wiederholen Button
