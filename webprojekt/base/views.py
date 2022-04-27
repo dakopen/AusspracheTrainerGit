@@ -12,12 +12,14 @@ from utils.audio import generate_time_stamp, Audioverarbeitung
 from time import sleep
 from utils.Auswertung import auswertung, sprachfehler_from_scores, adjektiv_fuer_score, calculate_colour
 import re
+from utils.database import Database
 import logging
 
 logging.basicConfig(filename='test.log', encoding='utf-8-sig', level=logging.DEBUG)
 
 def home(request):
     request.session["id"] = secrets.token_urlsafe(6)
+
     context = {
         "textgenerator": [
             "Zufälligen Satz",
@@ -111,6 +113,9 @@ def audio(request):
 def result(request):
     session_id = get_session_id(request)
 
+    # --- DATENBANK --- #
+    db = Database(session_id)
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
 
         audioverarbeiter = Audioverarbeitung(str(request.session["audiopath_%s" % session_id]), str(request.session["cleantargetsatz_%s" % session_id]), str(request.session["audiopath_%s" % session_id]))
@@ -134,6 +139,9 @@ def result(request):
     
 
     if any(future for future in [future_google.result()[0], future_ibm.result()[0], future_at.result()] if future.startswith("#*# ERROR RECEIVED")):
+        # Ergebnis in der Datenbank speichern:
+        db.save_ergebnis(score=0, target_satz=request.session["rawtargetsatz_%s" % session_id], target_ipa=request.session["target_ipa_%s" % session_id], google_transcript=request.session["google_ki_%s" % session_id], google_ipa=request.session["google_ki_ipa_%s" % session_id], ibm_transcript=request.session["ibm_ki_%s" % session_id], ibm_ipa=request.session["ibm_ki_ipa_%s" % session_id], at_ipa=request.session["at_ki_%s" % session_id])
+
         return HttpResponse("<span class='red' style='font-size:1em;'>Error erhalten: Der aufgenommene Satz konnte nicht analysiert werden. Bitte erneut aufnehmen oder einen anderen Satz versuchen.</span>")
     
     
@@ -175,6 +183,9 @@ def result(request):
 
     request.session["farbigeantwort_%s" % session_id] = farbigeAntwort
     # TODO: In eine Datenbank schreiben
+
+    
+    db.save_ergebnis(score=round(float(scores[0] * 100), 7), target_satz=request.session["rawtargetsatz_%s" % session_id], target_ipa=request.session["target_ipa_%s" % session_id], google_transcript=request.session["google_ki_%s" % session_id], google_ipa=request.session["google_ki_ipa_%s" % session_id], ibm_transcript=request.session["ibm_ki_%s" % session_id], ibm_ipa=request.session["ibm_ki_ipa_%s" % session_id], at_ipa=request.session["at_ki_%s" % session_id])
 
     return render(request, '../templates/ergebnis.html', context=context)
 
