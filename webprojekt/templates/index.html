@@ -35,7 +35,7 @@
                 benutzen.</h3>
         </noscript>
     </div>
-    {% include 'modules/header.html' %}
+    {% include "modules/header.html" %}
 
 
 
@@ -90,7 +90,7 @@
             {% csrf_token %}
         <button class="glow-on-hover" onclick="toggleRecording()" id="toggle-record">
 
-            <img id="mikrofon-icon" src="{% static 'assets/images/Mikrofon.svg' %}" style="filter: invert(1); height: 62%; width: 62%;"
+            <img id="mikrofon-icon" src="{% static 'assets/images/Mikrofon.svg' %}" style="filter: invert(1); height: 62%; width: 62%; pointer-events: none;"
                 alt="Mikrofon Icon">
 
         </button>

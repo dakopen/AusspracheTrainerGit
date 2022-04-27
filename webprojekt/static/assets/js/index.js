@@ -284,7 +284,6 @@ function startRecording() {
 function endRecordingState(){
     textarea.attr("readonly", false);
     binIcon.prop("disabled", false);
-    generierenButton.prop("disabled", false);
     clearTimeout(aufnahmeTimeout);
     secondsPassed = 0;
     clearInterval(remainingInterval);
@@ -402,6 +401,9 @@ function receiveResponse() {
             rightButton.unbind();
             rightButton.click(clearTextarea);
             rightButton.addClass("active");}
+
+            generierenButton.prop("disabled", false);
+
 
         })
     })
