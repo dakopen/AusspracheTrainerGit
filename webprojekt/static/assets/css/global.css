@@ -225,3 +225,45 @@ a {
     grid-template-columns: 1fr 3fr;
     row-gap: 1em;
   }
+
+/* Registrierfeld */
+
+.register-container {
+    margin: auto;
+    width: min(700px, 90%);
+
+}
+
+.register-container input {
+    width: max(min(95%, 600px), 250px);
+    height: 2em;
+    border: 2px solid var(--lila);
+    border-radius: 30px;
+    outline: none;
+    font-size: x-large;
+    padding-left: 0.5em;
+    display: block;
+    
+}
+
+.register-container input:focus {
+    box-shadow: -5px 4px 7px 0px #aa6bfd95, 5px -4px 7px 0px #5c50fe80;
+}
+
+.register-container label {
+    display:block;
+    clear:both;
+    margin-top: 1em;
+}
+
+.register-form {
+    min-width: 95%;
+}
+
+.center {
+    justify-content:center;
+    align-items:center;
+    display:flex;
+    height:100%;
+    width:100%;
+}

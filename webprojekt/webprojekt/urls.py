@@ -26,6 +26,11 @@ urlpatterns = [
     path("result/", views.result),
     path("transcripts/", views.get_other_transcripts),
 
+    path("profile/", views.profile, name="profile"),
+    path("register/", views.register, name="register"),
+    path("login/", views.login, name="login"),
+
+
     path("privacy-policy/", views.privacypolicy, name="privacy_policy"),
     path("sources/", views.sources, name="sources"),
     path("about/", views.about, name="about"),

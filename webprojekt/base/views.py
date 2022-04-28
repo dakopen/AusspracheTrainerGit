@@ -14,6 +14,9 @@ from utils.Auswertung import auswertung, sprachfehler_from_scores, adjektiv_fuer
 import re
 from utils.database import Database
 import logging
+from django.contrib.auth import login
+from django.contrib import messages
+from .forms import NewUserForm
 
 logging.basicConfig(filename='test.log', encoding='utf-8-sig', level=logging.DEBUG)
 
@@ -248,6 +251,27 @@ def training(request):
 
 def terms(request):
     return render(request, "../templates/terms.html")
+
+
+def profile(request):
+    return render(request, "../templates/register.html")
+
+def login(request):
+    return render(request, "../templates/register.html")
+
+
+def register(request):
+    if request.method == "POST":
+        form = NewUserForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Registration successful." )
+            return redirect("/")
+        messages.error(request, "Unsuccessful registration. Invalid information.")
+
+    form = NewUserForm()
+    return render(request, "../templates/register.html", context={"register_form":form})
 
 
 def robots_txt(request):
