@@ -265,10 +265,11 @@ def register(request):
         form = NewUserForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
-            messages.success(request, "Registration successful." )
+            #login(request, user), siehe: https://ordinarycoders.com/blog/article/django-user-register-login-logout
+            # TODO: Hier weitermachen
+            messages.success(request, "Registrierung erfolgreich." )
             return redirect("/")
-        messages.error(request, "Unsuccessful registration. Invalid information.")
+        messages.error(request, "Registrierung fehlgeschlagen. Ungültige Informationen.")
 
     form = NewUserForm()
     return render(request, "../templates/register.html", context={"register_form":form})
