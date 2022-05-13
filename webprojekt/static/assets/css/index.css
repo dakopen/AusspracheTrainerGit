@@ -742,7 +742,7 @@ img#mikrofon-icon {
     width: max(50%, min(100vw, 350px));
 }
 
-.sponsor-digitalocean {
+.sponsor-align {
     display: flex;
     justify-content: center;
 }
