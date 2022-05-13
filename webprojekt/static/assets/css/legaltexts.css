@@ -114,3 +114,9 @@ animation: sweep 0.3s ease-in-out;
     max-width: 1200px;
     margin:auto;
 }
+
+.register-error {
+    color: var(--red);
+    display: inline-block;
+    text-align: center;
+}

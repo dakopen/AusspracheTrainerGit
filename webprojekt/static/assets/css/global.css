@@ -9,10 +9,14 @@
     --light-rosa: #ECDFFE;
 }
 
+
 html,
 body {
     max-width: 100%;
     overflow-x: hidden;
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
 }
 
 html * {
@@ -68,7 +72,7 @@ blockquote {
     box-sizing: border-box;
 }
 
-li {
+.nav-menu li {
     list-style: none;
 }
 
@@ -192,12 +196,15 @@ a {
         padding: 10px;
         row-gap: 2em;
     }
+    .footer-br {
+        min-height: 400px;
+    }
 }
 
 @media all and (min-width: 769px) {
     #footer {
         background-size: cover;
-        min-height: 20vw;
+        min-height: 20vh;
         background-repeat: no-repeat;
     }
     .grid-container {
@@ -206,6 +213,16 @@ a {
         grid-template-columns: auto auto;
         padding: 10px;
     }
+    .footer-br {
+        min-height: max(20vh, 400px);
+    }
+}
+
+#footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    overflow: hidden;
 }
 
 .footer-space {
@@ -267,3 +284,10 @@ a {
     height:100%;
     width:100%;
 }
+
+.helptext {
+   color: var(--rosa);
+   font-size: small;
+   font-style: italic;
+}
+
