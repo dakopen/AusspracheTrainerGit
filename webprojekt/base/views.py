@@ -17,7 +17,6 @@ import logging
 from django.contrib.auth import login
 from django.contrib import messages
 from .forms import NewUserForm
-from django.contrib.auth import get_user_model
 
 logging.basicConfig(filename='test.log', encoding='utf-8-sig', level=logging.DEBUG)
 
@@ -260,11 +259,10 @@ def profile(request):
 def login(request):
     return render(request, "../templates/register.html")
 
-# Erstmal weglassen
+
 def register(request):
     if request.method == "POST":
         form = NewUserForm(request.POST)
-        print(form.is_valid())
         if form.is_valid():
             user = form.save()
             #login(request, user), siehe: https://ordinarycoders.com/blog/article/django-user-register-login-logout
@@ -272,21 +270,9 @@ def register(request):
             messages.success(request, "Registrierung erfolgreich." )
             return redirect("/")
         messages.error(request, "Registrierung fehlgeschlagen. Ungültige Informationen.")
-        return render(request, "../templates/register.html", context={"register_form":form, "register_error":"Registrierung fehlgeschlagen. Ungültige Informationen."})
 
     form = NewUserForm()
-    return render(request, "../templates/register.html", context={"register_form":form, "register_error":""})
-
-
-def checkusername(request):
-    username = (request.body).decode("utf-8-sig")
-    User = get_user_model()
-    benutzer = User.objects.all()
-    for b in benutzer:
-        if str(b.username).lower() == username.lower():
-            return HttpResponse("vergeben")
-    return HttpResponse("verfügbar")
-
+    return render(request, "../templates/register.html", context={"register_form":form})
 
 
 def robots_txt(request):

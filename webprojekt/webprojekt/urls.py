@@ -29,7 +29,7 @@ urlpatterns = [
     path("profile/", views.profile, name="profile"),
     path("register/", views.register, name="register"),
     path("login/", views.login, name="login"),
-    path("benutzername/", views.checkusername),
+
 
     path("privacy-policy/", views.privacypolicy, name="privacy_policy"),
     path("sources/", views.sources, name="sources"),
