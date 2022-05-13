@@ -35,43 +35,31 @@
                 {% csrf_token %}
                 <label for="username">Benutzername</label>
                 {{ register_form.username }}
-                <span id="username-already-exists" style="color: var(--red);"></span>
 
-                <span class="helptext">150 oder weniger Buchstaben, Zahlen oder folgende Sonderzeichen: @.+-_</span>
                 <label for="email">Email</label>
                 {{ register_form.email }}
 
                 <label for="password1">Passwort</label>
                 {{ register_form.password1 }}
-                <ul class="helptext">
-                    <li>Dein Passwort darf nicht zu ähnlich mit deinen anderen persönlichen Informationen sein.</li>
-                    <li>Dein Passwort muss mindestens 8 Buchstaben lang sein.</li>
-                    <li>Dein Password darf kein häufig verwendetes Passwort sein.</li>
-                    <li>Dein Password darf nicht nur aus Zahlen bestehen.</li>
-                </ul>
                 
                 <label for="password2">Passwort wiederholen</label>
                 {{ register_form.password2 }}
-                <span id="password-matching"></span>
 
 
 
                 <br>
                 <br>
-                <input id="submit-register" type="submit" value="Registrieren" style="background-color: var(--light-rosa);">
-                
-                <p class="register-error" align="center" style="width: max(min(95%, 600px), 250px);">{{ register_error }}</p>
+                <input type="submit" value="Registrieren" style="background-color: var(--light-rosa);">
                 <br>
-                <p class="text-center" align="center" style="width: max(min(95%, 600px), 250px);">Falls Du schon einen Account hast, kannst Du Dich <a href="/login">einloggen</a>.</p>
+
+                <p class="text-center" align="center" style="width: max(min(95%, 600px), 250px);">Falls Du schon einen Account hast, kannst du dich <a href="/login">einloggen</a>.</p>
+
             </form>
         </div>
+
     </div>
 
     {% include "modules/footer.html" %}
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{% static 'assets/js/global.js' %}"></script>
-    <script src="{% static 'assets/js/register.js' %}"></script>
-
 </body>
 
 
