@@ -7,7 +7,7 @@ import torch.nn.functional as F
 import torchaudio
 import time
 
-from webprojekt.base.views import BASE_DIR
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 path_to_model = BASE_DIR / "AusspracheTrainerKI.pt" 
 #path_to_model = r"C:\Users\dakop\OneDrive\AusspracheTrainerKI.pt"
