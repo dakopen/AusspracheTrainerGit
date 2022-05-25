@@ -16,6 +16,10 @@ var audioObjectListenAgain = null;
 var remainingInterval = null;
 var secondsPassed = 0;
 
+const previousFeatureButton = document.querySelector('.previous-feature');
+const nextFeatureButton = document.querySelector('.next-feature');
+
+
 
 const waveform = document.getElementById("waveform");
 var textareaMaxWidth = null;
@@ -492,3 +496,81 @@ function clearTextarea() {
     textarea.select();
     hideResponsearea();
 }
+
+
+/* FEATURE SLIDEBAR */
+
+function features_forward() {
+    var features = document.querySelectorAll(".feature");
+    var activeIndicators = document.querySelectorAll(".active-indicator");
+    var active_feature = document.querySelector(".feature.active");
+    for (var i = 0; i < features.length; i++) {
+        if (features[i] == active_feature) {
+            active_feature.classList.remove("active");
+            activeIndicators[i].classList.remove("active");
+            active_feature.style.transform = "translateX(-60%) scale(0.98)";
+            setTimeout(function() {
+                active_feature.style.transform = "";
+            }, 300)
+            if (i + 1 == features.length) {
+                features[0].classList.add("active");
+                activeIndicators[0].classList.add("active");
+
+                break;
+            }
+            features[i + 1].classList.add("active");
+            activeIndicators[i + 1].classList.add("active");
+
+            break;
+        }
+
+    }
+}
+
+
+function features_backward() {
+    var features = document.querySelectorAll(".feature");
+    var activeIndicators = document.querySelectorAll(".active-indicator");
+    var active_feature = document.querySelector(".feature.active");
+    for (var i = 0; i < features.length; i++) {
+        if (features[i] == active_feature) {
+            active_feature.classList.remove("active");
+            activeIndicators[i].classList.remove("active");
+            active_feature.style.transform = "translateX(-40%) scale(0.98)";
+            setTimeout(function() {
+                active_feature.style.transform = "";
+
+            }, 300)
+            if (i == 0) {
+                features[features.length - 1].classList.add("active");
+                activeIndicators[features.length - 1].classList.add("active");
+                break;
+            }
+            features[i - 1].classList.add("active");
+            activeIndicators[i - 1].classList.add("active");
+
+            break;
+        }
+    }
+}
+
+
+/* ON HOVER FUNKTION FÜR DIE FEATURE BUTTONS */
+
+
+
+previousFeatureButton.addEventListener("pointerover", function() {
+    previousFeatureButton.innerHTML = "&#171;";
+});
+previousFeatureButton.addEventListener("pointerout", function() {
+    previousFeatureButton.innerHTML = "&#8249;";
+});
+
+
+nextFeatureButton.addEventListener("pointerover", function() {
+    nextFeatureButton.innerHTML = "&#187;";
+});
+nextFeatureButton.addEventListener("pointerout", function() {
+    nextFeatureButton.innerHTML = "&#8250;";
+
+});

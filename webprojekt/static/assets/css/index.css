@@ -518,6 +518,7 @@ img#mikrofon-icon {
     width: max(5vw, 50px);
     font-size: 2em;
     color: var(--lila);
+    outline: none;
 }
 
 .active-indicator {

@@ -14,6 +14,10 @@ from utils.Auswertung import auswertung, sprachfehler_from_scores, adjektiv_fuer
 import re
 from utils.database import Database
 import logging
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 logging.basicConfig(filename='test.log', encoding='utf-8-sig', level=logging.DEBUG)
 
@@ -103,8 +107,8 @@ def audio(request):
         return HttpResponse("Bitte überprüfe den Übungssatz.")
 
     request.session["cleantargetsatz_%s" % session_id] = clean_targetsatz(request.META["HTTP_TARGETSATZ"])
-    request.session["audiopath_%s" % session_id] = f'./media/{timestamp}_{session_id}.wav'
-
+    request.session["audiopath_%s" % session_id] = f'{BASE_DIR}/media/{timestamp}_{session_id}.wav'
+    print(request.session["audiopath_%s" % session_id])
     with open(request.session["audiopath_%s" % session_id], "wb") as audiofile:
         audiofile.write(request.body)
 
