@@ -7,7 +7,10 @@ import torch.nn.functional as F
 import torchaudio
 import time
 
-path_to_model = r"C:\Users\dakop\OneDrive\AusspracheTrainerKI.pt"
+from webprojekt.base.views import BASE_DIR
+
+path_to_model = BASE_DIR / "AusspracheTrainerKI.pt" 
+#path_to_model = r"C:\Users\dakop\OneDrive\AusspracheTrainerKI.pt"
 text_transform = TextTransform()
 train_audio_transforms = nn.Sequential(
     torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_mels=127, normalized=True),
@@ -22,7 +25,8 @@ train_audio_transforms = nn.Sequential(
     torchaudio.transforms.TimeMasking(time_mask_param=100)
 )'''
 
-torchaudio.set_audio_backend("soundfile")  # zu Sox ändern bei Linux (?)
+#torchaudio.set_audio_backend("soundfile")  # zu Sox ändern bei Linux (?)
+torchaudio.set_audio_backend("sox_io")  # zu Sox ändern bei Linux (?)
 
 class AusspracheTrainerKI:
 
