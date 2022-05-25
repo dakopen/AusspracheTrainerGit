@@ -7,7 +7,10 @@ import torch.nn.functional as F
 import torchaudio
 import time
 
+from pathlib import Path
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 path_to_model = BASE_DIR / "AusspracheTrainerKI.pt" 
 #path_to_model = r"C:\Users\dakop\OneDrive\AusspracheTrainerKI.pt"
