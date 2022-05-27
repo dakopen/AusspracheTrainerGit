@@ -32,6 +32,7 @@ textarea.on('input change keyup paste', function(){
     checkTextareaInputServerside();
     hideAufnahmeFehler();
     hideResponsearea();
+    makeTranscriptsInactive();
 });
 
 $(window).resize(windowResize);
@@ -234,6 +235,19 @@ function finalTextareaCheckBeforeRecording(){
 }
 
 function startRecording() {
+
+    try {
+        const collection = document.getElementsByClassName("transcript-btn");
+        for (let i = 0; i < collection.length; i++) {
+            if (collection[i].classList.contains("active"))
+                setTextareaToOriginal();
+        }  
+    }
+    catch (e) {
+    }
+     
+
+
     navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function (stream) {
         console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
         textarea.attr("readonly", true); 
@@ -476,6 +490,19 @@ function receiveOtherTranscripts(transcript) {
         })
     })
 }
+
+function setTextareaToOriginal(){
+    receiveOtherTranscripts("original");        
+    makeTranscriptsInactive();
+}
+
+function makeTranscriptsInactive(){
+    const collection = document.getElementsByClassName("transcript-btn");
+    for (let i = 0; i < collection.length; i++) {
+        collection[i].classList.remove("active");
+    }
+}
+
 
 function showTranscript(event){
     event.target.classList.toggle("active");

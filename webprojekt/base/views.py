@@ -67,9 +67,13 @@ def satzgenerator(request):
     satzart = (request.body).decode("utf-8-sig")  # [Zufälligen Satz / Sch-Satz / ...]
     jetziger_satz = str(request.headers["currenttextarea"])  # *, jeder vom Benutzer eingegebene Satz
     if satzart == "Zufälligen Satz":
-        with open("static/assets/other/random_sentences_de.txt", "r",
-                  encoding="utf-8-sig") as random_saetze:
-            lines = random_saetze.readlines()
+        try:
+            with open("static/assets/other/random_sentences_de.txt", "r",
+                    encoding="utf-8-sig") as random_saetze:
+                lines = random_saetze.readlines()
+        except FileNotFoundError:  # Local testing
+            with open(r"webprojekt\static\assets\other\random_sentences_de.txt", "r", encoding="utf-8-sig") as random_saetze:
+                lines = random_saetze.readlines()
     elif satzart == "Sch-Satz":
         lines = ["Am Strand bauen die Kinder mit dem Spielzeug und der Schaufel eine Sandburg.", "Die Schnecken hinterlassen eine Schleimspur auf der Straße.", "Auf der Schnellstraße herrscht schneller Straßenverkehr.", "Spreewaldgurken schmecken gut, sind aber im Spreewald am schmackhaftesten.", "Die Schlange erschreckt die Spinne im Spind.", "Das Schulkind versteckt sich im Schrank.", "Seine Schüssel sprang in zwei.", "Hirsche haben ein prächtiges Geweih.", "Die schmützige Wärsche gehört in den schwarzen Korb.", "Stefan erscheint als letzter auf dem Schiff.", "Im Schwarzwald gibt es Schmetterlinge zu beobachten.", "Im Schein der Sonne schmilzt der Schneeman dahin.", "Dem Schwein schmeckt die geschälte Kartoffel.", "Hast du im Sportunterricht an Schnelligkeit gewonnen?", "Sterne kann man am Strand bewundern.", "Schneide die Banane in Stücke!"]
     elif satzart == "Ch-Satz":
