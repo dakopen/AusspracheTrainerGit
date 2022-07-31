@@ -1,6 +1,5 @@
 from datetime import datetime
 import pathlib
-import logging
 import time
 from utils.IPA import IPA
 import speech_recognition as sr
@@ -70,5 +69,5 @@ class Audioverarbeitung:
         try:
             audio_file.unlink()
         except FileNotFoundError:
-            logging.debug("Fehler die Audiodatei zu löschen")
+            #logger.info("Fehler die Audiodatei zu löschen")
             print("Error unlinking file!")

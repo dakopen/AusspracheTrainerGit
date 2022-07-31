@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger("django")
 from ibm_watson.websocket import RecognizeCallback
 from ibm_watson import SpeechToTextV1
 from ibm_watson.websocket import AudioSource
@@ -6,8 +8,6 @@ import os
 
 ibm_service_url = os.environ.get("IBM_SERVICE_URL")
 ibm_authenticator = os.environ.get("IBM_AUTHENTICATOR")
-import logging
-logging.disable(logging.INFO)
 
 class MyRecognizeCallback(RecognizeCallback):
     def __init__(self):

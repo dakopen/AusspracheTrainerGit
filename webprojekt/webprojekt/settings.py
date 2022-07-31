@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
-from re import T
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -131,3 +130,33 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING_CONFIG = None
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+    'simple': {
+        'format': '%(levelname)s %(asctime)s %(filename)s %(name)s.%(funcName)s:%(lineno)s- %(message)s'
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'root': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
+
+import logging.config
+logging.config.dictConfig(LOGGING)

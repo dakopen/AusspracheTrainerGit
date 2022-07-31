@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger("django")
+
 from sqlite3 import Timestamp
 import sys
 import secrets
@@ -13,13 +16,13 @@ from time import sleep
 from utils.Auswertung import auswertung, sprachfehler_from_scores, adjektiv_fuer_score, calculate_colour
 import re
 from utils.database import Database
-import logging
 from pathlib import Path
+logger = logging.getLogger("django")
+
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-logging.basicConfig(filename='test.log', encoding='utf-8-sig', level=logging.DEBUG)
 
 def home(request):
     request.session["id"] = secrets.token_urlsafe(6)
@@ -94,7 +97,7 @@ def satzgenerator(request):
 def audio(request):
     session_id = get_session_id(request)
     if sys.getsizeof(request.body) < 1000:
-        logging.debug(f"Aufnahme ist zu kurz: request.body: {sys.getsizeof(request.body)} | {session_id}")
+        logger.info(f"Aufnahme ist zu kurz: request.body: {sys.getsizeof(request.body)} | {session_id}")
         return HttpResponse("Die Audioaufnahme ist zu kurz. Bitte erneut aufnehmen.")
     elif sys.getsizeof(request.body) > 2300000:  # 2203725 maximale Größe auf Windows 11 Firefox TODO: Checken, ob es eine allgemeine Größe ist
         return HttpResponse("Die Audioaufnahme ist zu lang. Bitte erneut aufnehmen.")
@@ -102,12 +105,12 @@ def audio(request):
     timestamp = generate_time_stamp()
     request.session["rawtargetsatz_%s" % session_id] = save_raw_targetsatz(request.META["HTTP_TARGETSATZ"])
     if not request.session["rawtargetsatz_%s" % session_id]:
-        logging.debug(f"Not request.session[rawtargetsatz]: {request.session['rawtargetsatz_%s' % session_id]}  | {session_id}")
+        logger.info(f"Not request.session[rawtargetsatz]: {request.session['rawtargetsatz_%s' % session_id]}  | {session_id}")
         return HttpResponse("Bitte gib einen Übungssatz ein.")
 
     elif check_text(request.session["rawtargetsatz_%s" % session_id])[2]:
         print(f"Check_Text Fehler in request.session[rawtargetsatz]: {request.session['rawtargetsatz_%s' % session_id]}  | {session_id}")
-        logging.debug(f"Check_Text Fehler in request.session[rawtargetsatz]: {request.session['rawtargetsatz_%s' % session_id]}  | {session_id}")
+        logger.info(f"Check_Text Fehler in request.session[rawtargetsatz]: {request.session['rawtargetsatz_%s' % session_id]}  | {session_id}")
         return HttpResponse("Bitte überprüfe den Übungssatz.")
 
     request.session["cleantargetsatz_%s" % session_id] = clean_targetsatz(request.META["HTTP_TARGETSATZ"])
