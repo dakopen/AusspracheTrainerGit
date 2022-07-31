@@ -30,7 +30,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.environ.get("DEBUG")))
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "aussprachetrainer.org", "www.aussprachetrainer.org", "beta.aussprachetrainer.org"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "aussprachetrainer.org", "www.aussprachetrainer.org", "beta.aussprachetrainer.org", "161.35.217.173"]
 
 
 # Application definition
