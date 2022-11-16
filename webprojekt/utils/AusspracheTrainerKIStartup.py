@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchaudio
 import time
-
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,8 +28,13 @@ train_audio_transforms = nn.Sequential(
     torchaudio.transforms.TimeMasking(time_mask_param=100)
 )'''
 
-#torchaudio.set_audio_backend("soundfile")  # zu Sox ändern bei Linux (?)
-torchaudio.set_audio_backend("sox_io")  # zu Sox ändern bei Linux (?)
+try:
+    if os.environ["DEVELOPMENT"]:
+        torchaudio.set_audio_backend("soundfile")  # zu Sox ändern bei Linux (?)
+    else:
+        torchaudio.set_audio_backend("sox_io")
+except:
+    torchaudio.set_audio_backend("sox_io")
 
 class AusspracheTrainerKI:
 
